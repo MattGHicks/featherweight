@@ -4,6 +4,11 @@
       "command": "npx",
       "args": ["@modelcontextprotocol/server-filesystem", "."],
       "env": {}
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"],
+      "env": {}
     }
   }
 }

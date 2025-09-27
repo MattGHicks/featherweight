@@ -2,6 +2,8 @@
 
 A modern gear management application for ultralight backpackers. Track your gear weight, create optimized pack lists, and achieve your base weight goals.
 
+**🔗 Repository**: https://github.com/MattGHicks/featherweight.git
+
 **Current Status**: ✅ **Backend Complete** - Full API, authentication, and database ready. Frontend integration next!
 
 ## ✨ Features

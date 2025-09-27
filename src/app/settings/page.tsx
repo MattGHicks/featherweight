@@ -19,7 +19,7 @@ export default function SettingsPage() {
   const { data: session, status } = useSession();
 
   if (status === 'loading') {
-    return <div className="container py-6">Loading...</div>;
+    return <div className="container px-4 md:px-6 py-6">Loading...</div>;
   }
 
   if (!session) {
@@ -27,7 +27,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container py-6">
+    <div className="container px-4 md:px-6 py-6">
       <PageHeader
         title="Settings"
         description="Manage your account preferences and application settings"

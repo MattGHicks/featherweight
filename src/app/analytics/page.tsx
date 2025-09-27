@@ -12,7 +12,14 @@ export default function AnalyticsPage() {
   const { data: session, status } = useSession();
 
   if (status === 'loading') {
-    return <div className="container py-6">Loading...</div>;
+    return (
+      <div
+        className="w-full min-h-screen flex items-center justify-center"
+        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   if (!session) {
@@ -20,7 +27,10 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="container py-6">
+    <div
+      className="w-full min-h-screen"
+      style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+    >
       <PageHeader
         title="Weight Analytics"
         description="Analyze your gear weight distribution and track progress"

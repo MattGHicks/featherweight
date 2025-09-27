@@ -20,7 +20,14 @@ export default function Dashboard() {
   const { data: session, status } = useSession();
 
   if (status === 'loading') {
-    return <div className="container py-6">Loading...</div>;
+    return (
+      <div
+        className="w-full min-h-screen flex items-center justify-center"
+        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   if (!session) {
@@ -28,7 +35,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container py-6">
+    <div
+      className="w-full min-h-screen"
+      style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+    >
       <PageHeader
         title={`Welcome back, ${session.user?.name || 'there'}!`}
         description="Here's an overview of your gear and pack lists"
@@ -49,7 +59,13 @@ export default function Dashboard() {
         </div>
       </PageHeader>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div
+        className="grid gap-[2%] auto-fit-grid"
+        style={{
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(clamp(200px, 20vw, 300px), 1fr))',
+        }}
+      >
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -109,7 +125,14 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-2">
+      <div
+        className="grid gap-[2%]"
+        style={{
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(clamp(300px, 40vw, 500px), 1fr))',
+          marginTop: 'clamp(1.5rem, 3vw, 3rem)',
+        }}
+      >
         <Card>
           <CardHeader>
             <CardTitle>Recent Gear</CardTitle>

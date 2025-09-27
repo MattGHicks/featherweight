@@ -21,66 +21,107 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+      <div
+        className="flex items-center w-full"
+        style={{
+          height: 'clamp(3.5rem, 4vw, 4rem)',
+          padding: '0 clamp(1rem, 3vw, 2rem)',
+        }}
+      >
         <MobileNav />
         <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Backpack className="h-6 w-6" />
+          <Link
+            href="/"
+            className="mr-6 flex items-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          >
+            <Backpack className="h-6 w-6" aria-hidden="true" />
             <span className="hidden font-bold sm:inline-block">
               Featherweight
             </span>
+            <span className="sr-only">Featherweight Home</span>
           </Link>
         </div>
 
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <nav className="hidden md:flex items-center space-x-6">
-            {session && (
+        <div
+          className="flex flex-1 items-center justify-between"
+          style={{ gap: 'clamp(0.5rem, 1vw, 1rem)' }}
+        >
+          <nav
+            className="hidden md:flex items-center"
+            style={{ gap: 'clamp(1rem, 2vw, 2rem)' }}
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            {session ? (
               <>
                 <Link
                   href="/dashboard"
-                  className="text-sm font-medium transition-colors hover:text-primary"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/gear"
-                  className="text-sm font-medium transition-colors hover:text-primary"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
                 >
                   Gear
                 </Link>
                 <Link
                   href="/lists"
-                  className="text-sm font-medium transition-colors hover:text-primary"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
                 >
                   Pack Lists
                 </Link>
                 <Link
                   href="/analytics"
-                  className="text-sm font-medium transition-colors hover:text-primary"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
                 >
                   Analytics
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+                >
+                  Sign Up
                 </Link>
               </>
             )}
           </nav>
 
-          <div className="flex items-center space-x-2">
+          <div
+            className="flex items-center"
+            style={{ gap: 'clamp(0.5rem, 1vw, 1rem)' }}
+          >
             {status === 'loading' ? (
-              <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
+              <div
+                className="h-8 w-8 animate-pulse rounded-full bg-muted"
+                role="status"
+                aria-label="Loading user profile"
+              />
             ) : session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     className="relative h-8 w-8 rounded-full"
+                    aria-label={`Open user menu for ${session.user?.name || session.user?.email || 'user'}`}
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarImage
                         src={session.user?.image ?? ''}
-                        alt={session.user?.name ?? ''}
+                        alt={`Profile picture for ${session.user?.name || session.user?.email || 'user'}`}
                       />
                       <AvatarFallback>
-                        <User className="h-4 w-4" />
+                        <User className="h-4 w-4" aria-hidden="true" />
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -101,7 +142,7 @@ export function SiteHeader() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/settings">
-                      <Settings className="mr-2 h-4 w-4" />
+                      <Settings className="mr-2 h-4 w-4" aria-hidden="true" />
                       Settings
                     </Link>
                   </DropdownMenuItem>
@@ -110,13 +151,15 @@ export function SiteHeader() {
                     className="cursor-pointer"
                     onSelect={() => signOut()}
                   >
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
                     Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={() => signIn()}>Sign In</Button>
+              <Button onClick={() => signIn()} className="min-h-[44px]">
+                Sign In
+              </Button>
             )}
           </div>
         </div>

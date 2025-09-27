@@ -13,7 +13,7 @@ export default function NewPackListPage() {
   const { data: session, status } = useSession();
 
   if (status === 'loading') {
-    return <div className="container py-6">Loading...</div>;
+    return <div className="container px-4 md:px-6 py-6">Loading...</div>;
   }
 
   if (!session) {
@@ -21,7 +21,7 @@ export default function NewPackListPage() {
   }
 
   return (
-    <div className="container py-6">
+    <div className="container px-4 md:px-6 py-6">
       <PageHeader
         title="Create New Pack List"
         description="Create a new pack list for your next adventure"

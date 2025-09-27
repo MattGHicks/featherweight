@@ -20,8 +20,17 @@ export default function LoginPage() {
 
   if (status === 'loading') {
     return (
-      <div className="container flex h-screen w-screen flex-col items-center justify-center">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+      <div
+        className="flex h-screen w-screen flex-col items-center justify-center"
+        style={{ padding: 'clamp(1rem, 3vw, 2rem)' }}
+      >
+        <div
+          className="mx-auto flex w-full flex-col justify-center"
+          style={{
+            maxWidth: 'clamp(300px, 90vw, 400px)',
+            gap: 'clamp(1rem, 3vw, 1.5rem)',
+          }}
+        >
           <div className="flex flex-col space-y-2 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
               <Backpack className="h-6 w-6 text-primary-foreground" />
@@ -40,18 +49,32 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="container flex h-screen w-screen flex-col items-center justify-center">
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-        <div className="flex flex-col space-y-2 text-center">
+    <div
+      className="flex h-screen w-screen flex-col items-center justify-center"
+      style={{ padding: 'clamp(1rem, 3vw, 2rem)' }}
+    >
+      <div
+        className="mx-auto flex w-full flex-col justify-center"
+        style={{
+          maxWidth: 'clamp(300px, 90vw, 400px)',
+          gap: 'clamp(1rem, 3vw, 1.5rem)',
+        }}
+      >
+        <div className="flex flex-col space-y-4 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-            <Backpack className="h-6 w-6 text-primary-foreground" />
+            <Backpack
+              className="h-6 w-6 text-primary-foreground"
+              aria-hidden="true"
+            />
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Welcome back
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Sign in to your Featherweight account
-          </p>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Welcome back
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Sign in to your Featherweight account
+            </p>
+          </div>
         </div>
 
         <Card>
@@ -63,7 +86,7 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              className="w-full"
+              className="w-full min-h-[44px]"
               onClick={() => signIn('email', { callbackUrl: '/dashboard' })}
             >
               Continue with Email
@@ -80,14 +103,14 @@ export default function LoginPage() {
             </div>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full min-h-[44px]"
               onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
             >
               Continue with Google
             </Button>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full min-h-[44px]"
               onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
             >
               Continue with GitHub
@@ -99,7 +122,7 @@ export default function LoginPage() {
           Don&apos;t have an account?{' '}
           <Link
             href="/signup"
-            className="hover:text-brand underline underline-offset-4"
+            className="text-primary hover:text-primary/80 underline underline-offset-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
           >
             Sign up
           </Link>
