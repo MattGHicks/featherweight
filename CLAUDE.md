@@ -98,6 +98,20 @@ npm test             # Run Jest tests
 npm run test:e2e     # Run Playwright tests
 ```
 
+**⚠️ CRITICAL: Development Server Port Requirement**
+
+The development server MUST run on port 3000 (http://localhost:3000) because:
+
+- NextAuth.js callbacks are configured for port 3000
+- OAuth providers (Google, GitHub) have redirect URIs set to port 3000
+- Email authentication magic links point to port 3000
+
+If port 3000 is in use:
+
+1. Find and kill the process: `lsof -i :3000` then `kill -9 <PID>`
+2. Ensure no other development servers are running
+3. Start with `npm run dev` to verify it uses port 3000
+
 ### Database
 
 ```bash
@@ -147,6 +161,7 @@ npm run start        # Test production build locally
 
 ## Claude Code Specific Notes
 
+- **⚠️ CRITICAL**: Always ensure development server runs on port 3000 (authentication will fail on other ports)
 - Run `npm run lint && npm run type-check` before marking tasks complete
 - Use visual mockups when implementing UI components
 - Prefer editing existing files over creating new ones
