@@ -1,18 +1,38 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { Package, Plus, Search } from 'lucide-react';
+import { Package, Plus, Table as TableIcon, Grid3X3 } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { GearTable } from '@/components/gear/gear-table';
+import { GearFilters } from '@/components/gear/gear-filters';
+import { GearItemCard } from '@/components/gear/gear-item-card';
+import { GearEditDialog } from '@/components/gear/gear-edit-dialog';
+import { useGear } from '@/hooks/use-gear';
+import { formatWeight } from '@/lib/utils';
+
+type ViewMode = 'table' | 'grid';
 
 export default function GearPage() {
   const { data: session, status } = useSession();
+  const { gearItems, categories, isLoading, error, deleteGearItem, updateGearItem } = useGear();
+
+  // View and filter state
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+
+  // Edit dialog state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   if (status === 'loading') {
     return (
@@ -29,6 +49,88 @@ export default function GearPage() {
     redirect('/login');
   }
 
+  if (error) {
+    return (
+      <div
+        className="w-full min-h-screen flex items-center justify-center"
+        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+      >
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading gear items</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Enhanced filtering logic
+  const filteredGearItems = useMemo(() => {
+    return gearItems.filter(item => {
+      // Search filter
+      const matchesSearch = !searchTerm ||
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.category.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+      // Category filter
+      const matchesCategory = !selectedCategory || item.category.id === selectedCategory;
+
+      // Type filter
+      const matchesType = !selectedType ||
+        (selectedType === 'base' && !item.isWorn && !item.isConsumable) ||
+        (selectedType === 'worn' && item.isWorn) ||
+        (selectedType === 'consumable' && item.isConsumable);
+
+      return matchesSearch && matchesCategory && matchesType;
+    });
+  }, [gearItems, searchTerm, selectedCategory, selectedType]);
+
+  const hasActiveFilters = !!(searchTerm || selectedCategory || selectedType);
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory(null);
+    setSelectedType(null);
+  };
+
+  const handleEdit = (item: any) => {
+    setEditingItem(item);
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdate = async (data: any) => {
+    try {
+      setIsUpdating(true);
+      await updateGearItem(data.id, {
+        name: data.name,
+        description: data.description,
+        weight: data.weight,
+        quantity: data.quantity,
+        categoryId: data.categoryId,
+        isWorn: data.isWorn,
+        isConsumable: data.isConsumable,
+        retailerUrl: data.retailerUrl,
+      });
+    } catch (error) {
+      console.error('Error updating gear item:', error);
+      alert('Failed to update gear item. Please try again.');
+      throw error; // Re-throw to prevent dialog from closing
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async (item: any) => {
+    if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
+      try {
+        await deleteGearItem(item.id);
+      } catch (error) {
+        console.error('Error deleting gear item:', error);
+        alert('Failed to delete gear item. Please try again.');
+      }
+    }
+  };
+
   return (
     <div
       className="w-full min-h-screen"
@@ -38,37 +140,131 @@ export default function GearPage() {
         title="Gear Library"
         description="Manage all your gear items with detailed weight tracking"
       >
-        <Button asChild>
-          <Link href="/gear/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Gear
-          </Link>
-        </Button>
-      </PageHeader>
+        <div className="flex gap-2">
+          {/* View Mode Toggle */}
+          <div className="flex border rounded-md">
+            <Button
+              variant={viewMode === 'table' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('table')}
+              className="border-none rounded-r-none"
+            >
+              <TableIcon className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className="border-none rounded-l-none"
+            >
+              <Grid3X3 className="h-4 w-4" />
+            </Button>
+          </div>
 
-      <div className="flex items-center space-x-2 mb-6">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search gear..." className="pl-8" />
-        </div>
-      </div>
-
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-          <Package className="h-16 w-16 text-muted-foreground mb-6" />
-          <h3 className="text-lg font-semibold mb-2">No gear items yet</h3>
-          <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-            Start building your gear library by adding your first item. Track
-            weights, categories, and more.
-          </p>
           <Button asChild>
             <Link href="/gear/new">
               <Plus className="mr-2 h-4 w-4" />
-              Add Your First Gear Item
+              Add Gear
             </Link>
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </PageHeader>
+
+      {/* Filters */}
+      <div className="mb-6">
+        <GearFilters
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          selectedType={selectedType}
+          onTypeChange={setSelectedType}
+          categories={categories}
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={handleClearFilters}
+        />
+      </div>
+
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-muted-foreground">Loading gear items...</div>
+        </div>
+      ) : filteredGearItems.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <Package className="h-16 w-16 text-muted-foreground mb-6" />
+            <h3 className="text-lg font-semibold mb-2">
+              {hasActiveFilters ? 'No gear items found' : 'No gear items yet'}
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+              {hasActiveFilters
+                ? 'Try adjusting your filters to find what you\'re looking for.'
+                : 'Start building your gear library by adding your first item. Track weights, categories, and more.'
+              }
+            </p>
+            {hasActiveFilters ? (
+              <Button onClick={handleClearFilters} variant="outline">
+                Clear Filters
+              </Button>
+            ) : (
+              <Button asChild>
+                <Link href="/gear/new">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First Gear Item
+                </Link>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Content based on view mode */}
+          {viewMode === 'table' ? (
+            <GearTable
+              gearItems={filteredGearItems}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ) : (
+            <>
+              <div className="mb-4 text-sm text-muted-foreground">
+                {filteredGearItems.length} item{filteredGearItems.length !== 1 ? 's' : ''}
+                {hasActiveFilters && ' (filtered)'}
+                • Total weight: {formatWeight(filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0))}
+              </div>
+              <div
+                className="grid gap-6"
+                style={{
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                }}
+              >
+                {filteredGearItems.map((item) => (
+                  <GearItemCard
+                    key={item.id}
+                    item={item}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    units="metric"
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* Edit Dialog */}
+      <GearEditDialog
+        isOpen={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setEditingItem(null);
+        }}
+        gearItem={editingItem}
+        categories={categories}
+        onSubmit={handleUpdate}
+        isLoading={isUpdating}
+      />
     </div>
   );
 }

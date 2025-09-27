@@ -15,9 +15,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { useDashboardStats } from '@/hooks/use-dashboard-stats';
+import { formatWeight } from '@/lib/utils';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
+  const { stats, isLoading, error } = useDashboardStats();
 
   if (status === 'loading') {
     return (
@@ -32,6 +35,20 @@ export default function Dashboard() {
 
   if (!session) {
     redirect('/login');
+  }
+
+  if (error) {
+    return (
+      <div
+        className="w-full min-h-screen flex items-center justify-center"
+        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+      >
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading dashboard data</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -74,9 +91,14 @@ export default function Dashboard() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : stats.totalGearItems}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Start building your gear library
+              {stats.totalGearItems === 0
+                ? 'Start building your gear library'
+                : `${stats.totalGearItems} item${stats.totalGearItems !== 1 ? 's' : ''} in your library`
+              }
             </p>
           </CardContent>
         </Card>
@@ -87,9 +109,14 @@ export default function Dashboard() {
             <List className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : stats.totalPackLists}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Create your first pack list
+              {stats.totalPackLists === 0
+                ? 'Create your first pack list'
+                : `${stats.totalPackLists} pack list${stats.totalPackLists !== 1 ? 's' : ''} created`
+              }
             </p>
           </CardContent>
         </Card>
@@ -102,8 +129,20 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">--</div>
-            <p className="text-xs text-muted-foreground">No pack lists yet</p>
+            <div className="text-2xl font-bold">
+              {isLoading
+                ? '...'
+                : stats.lightestBaseWeight
+                  ? formatWeight(stats.lightestBaseWeight)
+                  : '--'
+              }
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.lightestBaseWeight
+                ? 'Your personal best'
+                : 'No pack lists yet'
+              }
+            </p>
           </CardContent>
         </Card>
 
@@ -139,15 +178,42 @@ export default function Dashboard() {
             <CardDescription>Your latest gear additions</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <Package className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-sm text-muted-foreground mb-4">
-                No gear items yet. Start building your gear library.
-              </p>
-              <Button asChild variant="outline">
-                <Link href="/gear/new">Add Your First Gear Item</Link>
-              </Button>
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-6">
+                <div className="text-sm text-muted-foreground">Loading...</div>
+              </div>
+            ) : stats.recentGear.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <Package className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  No gear items yet. Start building your gear library.
+                </p>
+                <Button asChild variant="outline">
+                  <Link href="/gear/new">Add Your First Gear Item</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {stats.recentGear.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.category.name}
+                      </p>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {formatWeight(item.weight)}
+                    </div>
+                  </div>
+                ))}
+                <div className="pt-2 border-t">
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href="/gear">View All Gear</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -157,16 +223,46 @@ export default function Dashboard() {
             <CardDescription>Your latest pack list updates</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <List className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-sm text-muted-foreground mb-4">
-                No pack lists yet. Create your first list to start planning
-                trips.
-              </p>
-              <Button asChild variant="outline">
-                <Link href="/lists/new">Create Your First Pack List</Link>
-              </Button>
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-6">
+                <div className="text-sm text-muted-foreground">Loading...</div>
+              </div>
+            ) : stats.recentPackLists.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <List className="h-12 w-12 text-muted-foreground mb-4" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  No pack lists yet. Create your first list to start planning
+                  trips.
+                </p>
+                <Button asChild variant="outline">
+                  <Link href="/lists/new">Create Your First Pack List</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {stats.recentPackLists.map((list) => (
+                  <div key={list.id} className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{list.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {list.stats.itemCount} items
+                      </p>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {list.stats.baseWeight > 0
+                        ? formatWeight(list.stats.baseWeight)
+                        : '--'
+                      }
+                    </div>
+                  </div>
+                ))}
+                <div className="pt-2 border-t">
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href="/lists">View All Lists</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
