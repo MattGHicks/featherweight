@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String  @id @default(cuid())
+  email           String  @unique
+  emailVerified   DateTime?
+  name            String?
+  image           String?
+  preferredUnits  String  @default("imperial") // "metric" or "imperial"
+  baseWeightGoal  Float?  // in grams
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  accounts        Account[]
+  sessions        Session[]
+  gearItems       GearItem[]
+  packLists       PackList[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  color     String     @default("#6b7280") // hex color for visual organization
+  order     Int        @default(0)
+  isDefault Boolean    @default(false) // system vs user categories
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Relations
+  gearItems GearItem[]
+
+  @@map("categories")
+}
+
+model GearItem {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  name         String
+  description  String?
+  weight       Float    // in grams
+  quantity     Int      @default(1)
+  categoryId   String   @map("category_id")
+  imageUrl     String?  @map("image_url")
+  isWorn       Boolean  @default(false) @map("is_worn")
+  isConsumable Boolean  @default(false) @map("is_consumable")
+  retailerUrl  String?  @map("retailer_url")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category     Category        @relation(fields: [categoryId], references: [id])
+  packListItems PackListItem[]
+
+  @@map("gear_items")
+}
+
+model PackList {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  name        String
+  description String?
+  isPublic    Boolean  @default(false) @map("is_public")
+  shareSlug   String?  @unique @map("share_slug")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     PackListItem[]
+
+  @@map("pack_lists")
+}
+
+model PackListItem {
+  id         String  @id @default(cuid())
+  packListId String  @map("pack_list_id")
+  gearItemId String  @map("gear_item_id")
+  quantity   Int     @default(1)
+  isIncluded Boolean @default(true) @map("is_included") // for planning purposes
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  packList PackList @relation(fields: [packListId], references: [id], onDelete: Cascade)
+  gearItem GearItem @relation(fields: [gearItemId], references: [id], onDelete: Cascade)
+
+  @@unique([packListId, gearItemId])
+  @@map("pack_list_items")
+}
