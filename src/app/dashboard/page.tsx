@@ -17,10 +17,12 @@ import {
 } from '@/components/ui/card';
 import { WeightDisplay } from '@/components/ui/weight-display';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
+import { useUserPreferences } from '@/contexts/user-preferences-context';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const { stats, isLoading, error } = useDashboardStats();
+  const { preferences } = useUserPreferences();
 
   if (status === 'loading') {
     return (
@@ -131,7 +133,10 @@ export default function Dashboard() {
               {isLoading ? (
                 '...'
               ) : stats.lightestBaseWeight ? (
-                <WeightDisplay grams={stats.lightestBaseWeight} />
+                <WeightDisplay
+                  grams={stats.lightestBaseWeight}
+                  preferredUnit={preferences?.preferredUnits}
+                />
               ) : (
                 '--'
               )}
@@ -206,7 +211,10 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      <WeightDisplay grams={item.weight} />
+                      <WeightDisplay
+                        grams={item.weight}
+                        preferredUnit={preferences?.preferredUnits}
+                      />
                     </div>
                   </div>
                 ))}
@@ -258,7 +266,10 @@ export default function Dashboard() {
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {list.stats.baseWeight > 0 ? (
-                        <WeightDisplay grams={list.stats.baseWeight} />
+                        <WeightDisplay
+                          grams={list.stats.baseWeight}
+                          preferredUnit={preferences?.preferredUnits}
+                        />
                       ) : (
                         '--'
                       )}

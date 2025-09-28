@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
 
+import { useUserPreferences } from '@/contexts/user-preferences-context';
+
 import { BarChart3, Scale, Target, TrendingUp } from 'lucide-react';
 
 import { CategoryBreakdownChart } from '@/components/analytics/category-breakdown-chart';
@@ -56,6 +58,7 @@ interface AnalyticsData {
 
 export default function AnalyticsPage() {
   const { data: session, status } = useSession();
+  const { preferences } = useUserPreferences();
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -174,7 +177,10 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <WeightDisplay grams={analytics.averageBaseWeight} />
+              <WeightDisplay
+                grams={analytics.averageBaseWeight}
+                preferredUnit={preferences?.preferredUnits}
+              />
             </div>
             <CardDescription>
               Across {analytics.totalPackLists} pack lists
@@ -191,7 +197,10 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              <WeightDisplay grams={analytics.lightestBaseWeight} />
+              <WeightDisplay
+                grams={analytics.lightestBaseWeight}
+                preferredUnit={preferences?.preferredUnits}
+              />
             </div>
             <CardDescription>Your personal best</CardDescription>
           </CardContent>
@@ -275,7 +284,10 @@ export default function AnalyticsPage() {
                         </div>
                       </div>
                       <div className="text-lg font-bold">
-                        <WeightDisplay grams={item.weight} />
+                        <WeightDisplay
+                          grams={item.weight}
+                          preferredUnit={preferences?.preferredUnits}
+                        />
                       </div>
                     </div>
                   ))}

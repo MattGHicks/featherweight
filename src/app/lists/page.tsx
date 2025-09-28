@@ -6,6 +6,8 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { useUserPreferences } from '@/contexts/user-preferences-context';
+
 import { List, Plus, Search } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/page-header';
@@ -17,6 +19,7 @@ import { usePackLists } from '@/hooks/use-pack-lists';
 
 export default function PackListsPage() {
   const { data: session, status } = useSession();
+  const { preferences } = useUserPreferences();
   const { packLists, isLoading, error, deletePackList } = usePackLists();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -142,6 +145,7 @@ export default function PackListsPage() {
                   console.log('Edit pack list:', packList);
                 }}
                 onDelete={handleDelete}
+                preferredUnit={preferences?.preferredUnits}
               />
             ))}
           </div>

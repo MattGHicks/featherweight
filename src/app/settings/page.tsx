@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useUserPreferences } from '@/hooks/use-user-preferences';
+import { useUserPreferences } from '@/contexts/user-preferences-context';
 import {
   WEIGHT_UNITS,
   formatWeight,

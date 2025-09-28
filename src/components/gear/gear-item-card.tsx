@@ -14,15 +14,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { WeightUnit } from '@/lib/weight-utils';
 import type { GearItemWithCategory } from '@/types';
 
 interface GearItemCardProps {
   item: GearItemWithCategory;
   onEdit?: (item: GearItemWithCategory) => void;
   onDelete?: (item: GearItemWithCategory) => void;
+  preferredUnit?: WeightUnit;
 }
 
-export function GearItemCard({ item, onEdit, onDelete }: GearItemCardProps) {
+export function GearItemCard({ item, onEdit, onDelete, preferredUnit }: GearItemCardProps) {
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md">
       <div className="relative aspect-square">
@@ -107,7 +109,10 @@ export function GearItemCard({ item, onEdit, onDelete }: GearItemCardProps) {
       <CardFooter className="flex items-center justify-between p-4 pt-0">
         <div className="flex items-center space-x-2">
           <span className="text-lg font-bold">
-            <WeightDisplay grams={item.weight * item.quantity} />
+            <WeightDisplay
+              grams={item.weight * item.quantity}
+              preferredUnit={preferredUnit}
+            />
           </span>
           {item.quantity > 1 && (
             <Badge variant="outline">×{item.quantity}</Badge>

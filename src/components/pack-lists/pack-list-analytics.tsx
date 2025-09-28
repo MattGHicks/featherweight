@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { WeightUnit } from '@/lib/weight-utils';
 
 interface GearItem {
   id: string;
@@ -54,11 +55,13 @@ interface PackListAnalyticsProps {
     baseWeightGoal?: number;
     totalWeightGoal?: number;
   };
+  preferredUnit?: WeightUnit;
 }
 
 export function PackListAnalytics({
   items,
   userGoals,
+  preferredUnit,
 }: PackListAnalyticsProps) {
   const analytics = useMemo(() => {
     const includedItems = items.filter(item => item.isIncluded);
@@ -175,7 +178,10 @@ export function PackListAnalytics({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <WeightDisplay grams={analytics.totalWeight} />
+              <WeightDisplay
+                grams={analytics.totalWeight}
+                preferredUnit={preferredUnit}
+              />
             </div>
             {totalGoalProgress && (
               <div className="mt-2">
@@ -187,7 +193,10 @@ export function PackListAnalytics({
                   className={`text-xs mt-1 ${totalGoalProgress.isOverGoal ? 'text-red-600' : 'text-green-600'}`}
                 >
                   {totalGoalProgress.isOverGoal ? 'Over' : 'Under'} goal by{' '}
-                  <WeightDisplay grams={totalGoalProgress.difference} />
+                  <WeightDisplay
+                    grams={totalGoalProgress.difference}
+                    preferredUnit={preferredUnit}
+                  />
                 </p>
               </div>
             )}
@@ -201,7 +210,10 @@ export function PackListAnalytics({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <WeightDisplay grams={analytics.baseWeight} />
+              <WeightDisplay
+                grams={analytics.baseWeight}
+                preferredUnit={preferredUnit}
+              />
             </div>
             {baseGoalProgress && (
               <div className="mt-2">
@@ -213,7 +225,10 @@ export function PackListAnalytics({
                   className={`text-xs mt-1 ${baseGoalProgress.isOverGoal ? 'text-red-600' : 'text-green-600'}`}
                 >
                   {baseGoalProgress.isOverGoal ? 'Over' : 'Under'} goal by{' '}
-                  <WeightDisplay grams={baseGoalProgress.difference} />
+                  <WeightDisplay
+                    grams={baseGoalProgress.difference}
+                    preferredUnit={preferredUnit}
+                  />
                 </p>
               </div>
             )}
@@ -227,7 +242,10 @@ export function PackListAnalytics({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <WeightDisplay grams={analytics.wornWeight} />
+              <WeightDisplay
+                grams={analytics.wornWeight}
+                preferredUnit={preferredUnit}
+              />
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {((analytics.wornWeight / analytics.totalWeight) * 100).toFixed(
@@ -249,6 +267,7 @@ export function PackListAnalytics({
               Avg:{' '}
               <WeightDisplay
                 grams={analytics.totalWeight / analytics.itemCount}
+                preferredUnit={preferredUnit}
               />{' '}
               per item
             </p>
@@ -322,7 +341,10 @@ export function PackListAnalytics({
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-medium">
-                      <WeightDisplay grams={category.weight} />
+                      <WeightDisplay
+                        grams={category.weight}
+                        preferredUnit={preferredUnit}
+                      />
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {category.percentage}%
@@ -416,7 +438,10 @@ export function PackListAnalytics({
                 </div>
                 <div className="text-right">
                   <div className="font-medium">
-                    <WeightDisplay grams={item.weight} />
+                    <WeightDisplay
+                      grams={item.weight}
+                      preferredUnit={preferredUnit}
+                    />
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {((item.weight / analytics.totalWeight) * 100).toFixed(1)}%
@@ -445,7 +470,10 @@ export function PackListAnalytics({
                   Consider lighter alternatives for: {item.name}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Currently <WeightDisplay grams={item.weight} /> • Could
+                  Currently <WeightDisplay
+                    grams={item.weight}
+                    preferredUnit={preferredUnit}
+                  /> • Could
                   potentially save 20-40% weight
                 </div>
               </div>
@@ -459,7 +487,10 @@ export function PackListAnalytics({
                   <div className="text-xs text-yellow-700">
                     Consider removing non-essential items or finding lighter
                     alternatives to reach your{' '}
-                    <WeightDisplay grams={userGoals.baseWeightGoal} /> goal.
+                    <WeightDisplay
+                      grams={userGoals.baseWeightGoal}
+                      preferredUnit={preferredUnit}
+                    /> goal.
                   </div>
                 </div>
               )}

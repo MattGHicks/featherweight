@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { SwipeCard } from '@/components/ui/swipe-card';
 import { TouchButton } from '@/components/ui/touch-friendly-button';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { WeightUnit } from '@/lib/weight-utils';
 
 interface GearItem {
   id: string;
@@ -30,6 +31,7 @@ interface MobileGearListProps {
   onEdit: (item: GearItem) => void;
   onDelete: (id: string) => void;
   isLoading?: boolean;
+  preferredUnit?: WeightUnit;
 }
 
 export function MobileGearList({
@@ -37,6 +39,7 @@ export function MobileGearList({
   onEdit,
   onDelete,
   isLoading,
+  preferredUnit,
 }: MobileGearListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -127,12 +130,18 @@ export function MobileGearList({
                 <div className="flex items-center gap-1 text-sm">
                   <Weight className="h-3 w-3" />
                   <span className="font-medium">
-                    <WeightDisplay grams={item.weight * item.quantity} />
+                    <WeightDisplay
+                      grams={item.weight * item.quantity}
+                      preferredUnit={preferredUnit}
+                    />
                   </span>
                 </div>
                 {item.quantity > 1 && (
                   <div className="text-sm text-muted-foreground">
-                    {item.quantity}x <WeightDisplay grams={item.weight} /> each
+                    {item.quantity}x <WeightDisplay
+                      grams={item.weight}
+                      preferredUnit={preferredUnit}
+                    /> each
                   </div>
                 )}
               </div>

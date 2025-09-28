@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { WeightUnit } from '@/lib/weight-utils';
 
 interface PackListStats {
   totalWeight: number;
@@ -37,12 +38,14 @@ interface PackListCardProps {
   };
   onEdit?: (packList: any) => void;
   onDelete?: (packList: any) => void;
+  preferredUnit?: WeightUnit;
 }
 
 export function PackListCard({
   packList,
   onEdit,
   onDelete,
+  preferredUnit,
 }: PackListCardProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -131,7 +134,7 @@ export function PackListCard({
           <div>
             <div className="text-lg font-bold">
               {packList.stats.baseWeight > 0 ? (
-                <WeightDisplay grams={packList.stats.baseWeight} />
+                <WeightDisplay grams={packList.stats.baseWeight} preferredUnit={preferredUnit} />
               ) : (
                 '--'
               )}
@@ -141,7 +144,7 @@ export function PackListCard({
           <div>
             <div className="text-lg font-bold">
               {packList.stats.totalWeight > 0 ? (
-                <WeightDisplay grams={packList.stats.totalWeight} />
+                <WeightDisplay grams={packList.stats.totalWeight} preferredUnit={preferredUnit} />
               ) : (
                 '--'
               )}

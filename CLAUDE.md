@@ -449,6 +449,21 @@ Use environment variables for feature flags:
 - **Sample Data**: Comprehensive test data with 68 gear items and 5 realistic pack lists
 - **Weight Calculations**: Real-time calculations for total, base, worn, and consumable weights
 
+#### Performance Optimization ✅ COMPLETE (September 2024)
+
+- **Weight Unit Preferences Performance Fix**: Resolved excessive API calls to `/api/user/preferences`
+  - **Problem**: WeightDisplay components were triggering hundreds of API calls per page load
+  - **Root Cause 1**: WeightDisplay context bypass logic was faulty - components with `preferredUnit={undefined}` still triggered context calls
+  - **Root Cause 2**: UserPreferencesContext had infinite re-render loop due to `fetchingRef` in dependency array
+  - **Solution**:
+    - Fixed WeightDisplay to check `hasOwnProperty('preferredUnit')` instead of truthy value
+    - Replaced `useState` with `useRef` for `fetchingRef` to prevent dependency loop
+    - Systematic propagation of `preferredUnit` prop across all components with WeightDisplay
+  - **Result**: Reduced from hundreds of API calls to 1-2 calls per page load
+  - **Components Optimized**: PackListCard, GearTable, Dashboard, Analytics, Pack List Items, Mobile Gear List
+- **React Performance**: Eliminated unnecessary re-renders and context subscriptions
+- **Network Performance**: Dramatic reduction in API traffic and improved loading speeds
+
 ### 🔄 Next Steps (Priority Order)
 
 #### Phase 1: Enhanced User Experience ⚡ NEXT UP

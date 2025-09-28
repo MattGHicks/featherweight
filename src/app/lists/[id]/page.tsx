@@ -6,6 +6,8 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect, useParams } from 'next/navigation';
 
+import { useUserPreferences } from '@/contexts/user-preferences-context';
+
 import {
   ArrowLeft,
   BarChart3,
@@ -84,6 +86,7 @@ interface PackList {
 
 export default function PackListDetailPage() {
   const { data: session, status } = useSession();
+  const { preferences } = useUserPreferences();
   const params = useParams();
   const packListId = params.id as string;
 
@@ -417,7 +420,10 @@ export default function PackListDetailPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {packList.stats.baseWeight > 0 ? (
-                <WeightDisplay grams={packList.stats.baseWeight} />
+                <WeightDisplay
+                  grams={packList.stats.baseWeight}
+                  preferredUnit={preferences?.preferredUnits}
+                />
               ) : (
                 '--'
               )}
@@ -433,7 +439,10 @@ export default function PackListDetailPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {packList.stats.totalWeight > 0 ? (
-                <WeightDisplay grams={packList.stats.totalWeight} />
+                <WeightDisplay
+                  grams={packList.stats.totalWeight}
+                  preferredUnit={preferences?.preferredUnits}
+                />
               ) : (
                 '--'
               )}
@@ -484,13 +493,18 @@ export default function PackListDetailPage() {
                 onItemUpdated={handleItemUpdated}
                 onItemRemoved={handleItemRemoved}
                 packListId={packListId}
+                preferredUnit={preferences?.preferredUnits}
               />
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <PackListAnalytics items={packList.items} userGoals={userGoals} />
+          <PackListAnalytics
+            items={packList.items}
+            userGoals={userGoals}
+            preferredUnit={preferences?.preferredUnits}
+          />
         </TabsContent>
       </Tabs>
 

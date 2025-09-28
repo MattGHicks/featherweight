@@ -6,6 +6,8 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { useUserPreferences } from '@/contexts/user-preferences-context';
+
 import {
   Grid3X3,
   Package,
@@ -34,6 +36,7 @@ type ViewMode = 'table' | 'grid' | 'mobile';
 
 export default function GearPage() {
   const { data: session, status } = useSession();
+  const { preferences } = useUserPreferences();
   const {
     gearItems,
     categories,
@@ -323,6 +326,7 @@ export default function GearPage() {
                   setSelectedItems(selectedItems.filter(id => id !== itemId));
                 }
               }}
+              preferredUnit={preferences?.preferredUnits}
             />
           ) : viewMode === 'mobile' ? (
             <>
@@ -336,6 +340,7 @@ export default function GearPage() {
                     (sum, item) => sum + item.weight * item.quantity,
                     0
                   )}
+                  preferredUnit={preferences?.preferredUnits}
                 />
               </div>
               <MobileGearList
@@ -348,6 +353,7 @@ export default function GearPage() {
                   }
                 }}
                 isLoading={isLoading}
+                preferredUnit={preferences?.preferredUnits}
               />
             </>
           ) : (
@@ -362,6 +368,7 @@ export default function GearPage() {
                     (sum, item) => sum + item.weight * item.quantity,
                     0
                   )}
+                  preferredUnit={preferences?.preferredUnits}
                 />
               </div>
               <div
@@ -376,6 +383,7 @@ export default function GearPage() {
                     item={item}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    preferredUnit={preferences?.preferredUnits}
                   />
                 ))}
               </div>

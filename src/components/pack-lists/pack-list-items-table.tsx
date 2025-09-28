@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { WeightUnit } from '@/lib/weight-utils';
 
 interface GearItem {
   id: string;
@@ -54,6 +55,7 @@ interface PackListItemsTableProps {
   onItemUpdated: (item: PackListItem) => void;
   onItemRemoved: (itemId: string) => void;
   packListId: string;
+  preferredUnit?: WeightUnit;
 }
 
 export function PackListItemsTable({
@@ -61,6 +63,7 @@ export function PackListItemsTable({
   onItemUpdated,
   onItemRemoved,
   packListId,
+  preferredUnit,
 }: PackListItemsTableProps) {
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editQuantity, setEditQuantity] = useState<number>(1);
@@ -228,7 +231,10 @@ export function PackListItemsTable({
               </TableCell>
               <TableCell>
                 <span className="font-mono">
-                  <WeightDisplay grams={item.gearItem.weight} />
+                  <WeightDisplay
+                    grams={item.gearItem.weight}
+                    preferredUnit={preferredUnit}
+                  />
                 </span>
               </TableCell>
               <TableCell>
@@ -272,7 +278,10 @@ export function PackListItemsTable({
               </TableCell>
               <TableCell>
                 <span className="font-mono font-semibold">
-                  <WeightDisplay grams={totalWeight} />
+                  <WeightDisplay
+                    grams={totalWeight}
+                    preferredUnit={preferredUnit}
+                  />
                 </span>
               </TableCell>
               <TableCell>

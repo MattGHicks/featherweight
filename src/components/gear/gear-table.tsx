@@ -31,6 +31,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { WeightUnit } from '@/lib/weight-utils';
 
 interface Category {
   id: string;
@@ -69,6 +70,7 @@ interface GearTableProps {
   onDelete?: (item: GearItem) => void;
   selectedItems?: string[];
   onItemSelectionChange?: (itemId: string, selected: boolean) => void;
+  preferredUnit?: WeightUnit;
 }
 
 export function GearTable({
@@ -77,6 +79,7 @@ export function GearTable({
   onDelete,
   selectedItems = [],
   onItemSelectionChange,
+  preferredUnit,
 }: GearTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -227,7 +230,11 @@ export function GearTable({
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-muted-foreground">Unit Weight:</span>
-                  <WeightDisplay grams={item.weight} className="ml-2" />
+                  <WeightDisplay
+                    grams={item.weight}
+                    className="ml-2"
+                    preferredUnit={preferredUnit}
+                  />
                 </div>
                 <div>
                   <span className="text-muted-foreground">Quantity:</span>
@@ -238,6 +245,7 @@ export function GearTable({
                   <WeightDisplay
                     grams={item.weight * item.quantity}
                     className="ml-2 font-medium"
+                    preferredUnit={preferredUnit}
                   />
                 </div>
                 <div>
@@ -386,13 +394,19 @@ export function GearTable({
                         </Badge>
                       </TableCell>
                       <TableCell className="p-4 text-right font-mono tabular-nums">
-                        <WeightDisplay grams={item.weight} />
+                        <WeightDisplay
+                          grams={item.weight}
+                          preferredUnit={preferredUnit}
+                        />
                       </TableCell>
                       <TableCell className="p-4 text-center tabular-nums">
                         {item.quantity}
                       </TableCell>
                       <TableCell className="p-4 text-right font-mono font-medium tabular-nums">
-                        <WeightDisplay grams={item.weight * item.quantity} />
+                        <WeightDisplay
+                          grams={item.weight * item.quantity}
+                          preferredUnit={preferredUnit}
+                        />
                       </TableCell>
                       <TableCell className="p-4">
                         <div className="flex flex-wrap gap-1">
@@ -472,6 +486,7 @@ export function GearTable({
               (sum, item) => sum + item.weight * item.quantity,
               0
             )}
+            preferredUnit={preferredUnit}
           />
         </div>
       )}

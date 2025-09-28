@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { SiteHeader } from '@/components/layout/site-header';
 import { AuthProvider } from '@/components/providers/session-provider';
+import { UserPreferencesProvider } from '@/contexts/user-preferences-context';
 
 import './globals.css';
 
@@ -46,18 +47,20 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
-            >
-              Skip to main content
-            </a>
-            <SiteHeader />
-            <main id="main-content" className="flex-1" role="main">
-              {children}
-            </main>
-          </div>
+          <UserPreferencesProvider>
+            <div className="relative flex min-h-screen flex-col">
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
+              >
+                Skip to main content
+              </a>
+              <SiteHeader />
+              <main id="main-content" className="flex-1" role="main">
+                {children}
+              </main>
+            </div>
+          </UserPreferencesProvider>
         </AuthProvider>
       </body>
     </html>

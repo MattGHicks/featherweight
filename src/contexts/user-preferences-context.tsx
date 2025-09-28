@@ -1,9 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useSession } from 'next-auth/react';
-
 import { WeightUnit } from '@/lib/weight-utils';
 
 export interface UserPreferences {
@@ -12,22 +10,26 @@ export interface UserPreferences {
   totalWeightGoal: number | null;
 }
 
-interface UseUserPreferencesReturn {
+interface UserPreferencesContextType {
   preferences: UserPreferences | null;
   isLoading: boolean;
   error: string | null;
   updatePreferences: (updates: Partial<UserPreferences>) => Promise<void>;
 }
 
-export function useUserPreferences(): UseUserPreferencesReturn {
+const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
+
+export function UserPreferencesProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchingRef = useRef(false);
 
   const fetchPreferences = useCallback(async () => {
-    if (status !== 'authenticated' || !session) return;
+    if (status !== 'authenticated' || !session || fetchingRef.current) return;
 
+    fetchingRef.current = true;
     setIsLoading(true);
     setError(null);
 
@@ -44,10 +46,11 @@ export function useUserPreferences(): UseUserPreferencesReturn {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setIsLoading(false);
+      fetchingRef.current = false;
     }
   }, [status, session]);
 
-  const updatePreferences = async (updates: Partial<UserPreferences>) => {
+  const updatePreferences = useCallback(async (updates: Partial<UserPreferences>) => {
     if (!preferences) return;
 
     setIsLoading(true);
@@ -73,7 +76,7 @@ export function useUserPreferences(): UseUserPreferencesReturn {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [preferences]);
 
   useEffect(() => {
     if (status === 'authenticated') {
@@ -81,12 +84,29 @@ export function useUserPreferences(): UseUserPreferencesReturn {
     } else if (status === 'unauthenticated') {
       setPreferences(null);
     }
-  }, [status, fetchPreferences]);
+  }, [status, session?.user?.id, fetchPreferences]);
 
-  return {
-    preferences,
-    isLoading,
-    error,
-    updatePreferences,
-  };
+  const contextValue = useMemo(
+    () => ({
+      preferences,
+      isLoading,
+      error,
+      updatePreferences,
+    }),
+    [preferences, isLoading, error, updatePreferences]
+  );
+
+  return (
+    <UserPreferencesContext.Provider value={contextValue}>
+      {children}
+    </UserPreferencesContext.Provider>
+  );
+}
+
+export function useUserPreferences() {
+  const context = useContext(UserPreferencesContext);
+  if (context === undefined) {
+    throw new Error('useUserPreferences must be used within a UserPreferencesProvider');
+  }
+  return context;
 }
