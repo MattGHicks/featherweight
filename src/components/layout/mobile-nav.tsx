@@ -6,9 +6,9 @@ import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 
 import {
-  Backpack,
   BarChart3,
   ClipboardList,
+  Feather,
   LayoutDashboard,
   LogIn,
   LogOut,
@@ -68,7 +68,7 @@ export function MobileNav() {
               onClick={() => setOpen(false)}
             >
               <div className="p-2 bg-primary rounded-lg">
-                <Backpack
+                <Feather
                   className="h-5 w-5 text-primary-foreground"
                   aria-hidden="true"
                 />

@@ -3,7 +3,7 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
 
-import { Backpack, LogOut, Settings, User } from 'lucide-react';
+import { Feather, LogOut, Settings, User } from 'lucide-react';
 
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { GlobalSearch } from '@/components/search/global-search';
@@ -35,7 +35,7 @@ export function SiteHeader() {
             href="/"
             className="flex items-center space-x-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
           >
-            <Backpack className="h-6 w-6" aria-hidden="true" />
+            <Feather className="h-6 w-6" aria-hidden="true" />
             <span className="hidden font-bold sm:inline-block">
               Featherweight
             </span>

@@ -4,7 +4,7 @@ import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { Backpack } from 'lucide-react';
+import { Feather } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -33,7 +33,7 @@ export default function SignUpPage() {
         >
           <div className="flex flex-col space-y-2 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-              <Backpack className="h-6 w-6 text-primary-foreground" />
+              <Feather className="h-6 w-6 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight">
               Loading...
@@ -62,7 +62,7 @@ export default function SignUpPage() {
       >
         <div className="flex flex-col space-y-4 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-            <Backpack
+            <Feather
               className="h-6 w-6 text-primary-foreground"
               aria-hidden="true"
             />

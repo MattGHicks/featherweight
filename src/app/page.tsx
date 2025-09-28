@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { ArrowRight, Backpack, BarChart3, Scale } from 'lucide-react';
+import { ArrowRight, Backpack, BarChart3, Feather, Scale } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
