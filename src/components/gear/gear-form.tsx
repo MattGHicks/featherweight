@@ -80,73 +80,47 @@ export function GearForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Tent, sleeping bag, etc." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="categoryId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category.id} value={category.id}>
-                        <div className="flex items-center space-x-2">
-                          <div
-                            className="h-3 w-3 rounded-full"
-                            style={{ backgroundColor: category.color }}
-                          />
-                          <span>{category.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Tent, sleeping bag, etc." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
-          name="description"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Brand, model, notes..."
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                Optional details about the gear item
-              </FormDescription>
+              <FormLabel>Category</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {categories.map(category => (
+                    <SelectItem key={category.id} value={category.id}>
+                      <div className="flex items-center space-x-2">
+                        <div
+                          className="h-3 w-3 rounded-full"
+                          style={{ backgroundColor: category.color }}
+                        />
+                        <span>{category.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -201,21 +175,40 @@ export function GearForm({
 
         <FormField
           control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Brand, model, notes..."
+                  className="resize-none h-20"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Optional details about the gear item
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="imageUrl"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Image</FormLabel>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
-                  <FormLabel className="text-sm font-normal text-muted-foreground">
-                    Upload Image
-                  </FormLabel>
-                  <ImageUpload
-                    value={field.value}
-                    onChange={field.onChange}
-                    onRemove={() => field.onChange('')}
-                    disabled={isLoading}
-                  />
+                  <FormControl>
+                    <Input
+                      type="url"
+                      placeholder="Enter image URL or upload below"
+                      {...field}
+                    />
+                  </FormControl>
                 </div>
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
@@ -223,19 +216,19 @@ export function GearForm({
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
                     <span className="bg-background px-2 text-muted-foreground">
-                      Or enter URL
+                      Or
                     </span>
                   </div>
                 </div>
                 <div>
-                  <FormControl>
-                    <Input type="url" placeholder="https://..." {...field} />
-                  </FormControl>
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    onRemove={() => field.onChange('')}
+                    disabled={isLoading}
+                  />
                 </div>
               </div>
-              <FormDescription>
-                Upload an image file or provide a URL to an existing image
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -258,7 +251,7 @@ export function GearForm({
           )}
         />
 
-        <div className="flex space-x-6">
+        <div className="space-y-4">
           <FormField
             control={form.control}
             name="isWorn"
@@ -302,13 +295,18 @@ export function GearForm({
           />
         </div>
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-4 border-t">
           {onCancel && (
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="sm:w-auto"
+            >
               Cancel
             </Button>
           )}
-          <Button type="submit" disabled={isLoading}>
+          <Button type="submit" disabled={isLoading} className="sm:w-auto">
             {isLoading && <LoadingSpinner size="sm" className="mr-2" />}
             {submitLabel}
           </Button>

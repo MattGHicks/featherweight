@@ -1,6 +1,6 @@
 'use client';
 
-import { Filter, Search, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,10 @@ interface GearFiltersProps {
   onCategoryChange: (categoryId: string | null) => void;
   selectedType: string | null;
   onTypeChange: (type: string | null) => void;
+  sortBy: string;
+  onSortChange: (sortBy: string) => void;
+  sortOrder: 'asc' | 'desc';
+  onSortOrderChange: (order: 'asc' | 'desc') => void;
   categories: Category[];
   hasActiveFilters: boolean;
   onClearFilters: () => void;
@@ -38,6 +42,10 @@ export function GearFilters({
   onCategoryChange,
   selectedType,
   onTypeChange,
+  sortBy,
+  onSortChange,
+  sortOrder,
+  onSortOrderChange,
   categories,
   hasActiveFilters,
   onClearFilters,
@@ -102,6 +110,33 @@ export function GearFilters({
             </SelectContent>
           </Select>
 
+          {/* Sort Controls */}
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Select value={sortBy} onValueChange={onSortChange}>
+              <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Name</SelectItem>
+                <SelectItem value="weight">Weight</SelectItem>
+                <SelectItem value="totalWeight">Total Weight</SelectItem>
+                <SelectItem value="category">Category</SelectItem>
+                <SelectItem value="createdAt">Date Added</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="outline"
+              size="default"
+              onClick={() =>
+                onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')
+              }
+              className="px-3"
+            >
+              {sortOrder === 'asc' ? '↑' : '↓'}
+            </Button>
+          </div>
+
           {/* Clear Filters */}
           {hasActiveFilters && (
             <Button
@@ -122,7 +157,7 @@ export function GearFilters({
         <div className="flex flex-wrap gap-2">
           {searchTerm && (
             <Badge variant="secondary" className="gap-1">
-              Search: "{searchTerm}"
+              Search: &ldquo;{searchTerm}&rdquo;
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => onSearchChange('')}

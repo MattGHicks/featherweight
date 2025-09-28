@@ -110,13 +110,14 @@ export function ImageUpload({
 
   return (
     <div
-      className="relative cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 transition-colors hover:border-muted-foreground/50"
+      className="relative cursor-pointer rounded-lg border-2 border-dashed border-muted-foreground/25 p-4 sm:p-6 transition-colors hover:border-muted-foreground/50"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
       <input
         type="file"
         accept="image/*"
+        capture="environment"
         onChange={handleFileSelect}
         className="absolute inset-0 cursor-pointer opacity-0"
         disabled={disabled || isLoading}
@@ -131,7 +132,7 @@ export function ImageUpload({
           <>
             <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
             <p className="text-sm font-medium">
-              Click to upload or drag and drop
+              Click to upload, take photo, or drag and drop
             </p>
             <p className="text-xs text-muted-foreground">
               PNG, JPG, GIF up to 5MB

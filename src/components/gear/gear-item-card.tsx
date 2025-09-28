@@ -24,19 +24,24 @@ interface GearItemCardProps {
   preferredUnit?: WeightUnit;
 }
 
-export function GearItemCard({ item, onEdit, onDelete, preferredUnit }: GearItemCardProps) {
+export function GearItemCard({
+  item,
+  onEdit,
+  onDelete,
+  preferredUnit,
+}: GearItemCardProps) {
   return (
-    <Card className="group overflow-hidden transition-all hover:shadow-md">
+    <Card className="group overflow-hidden transition-all hover:shadow-md p-0">
       <div className="relative aspect-square">
         {item.imageUrl ? (
           <Image
             src={item.imageUrl}
             alt={item.name}
             fill
-            className="object-cover"
+            className="object-cover rounded-t-lg"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-muted">
+          <div className="flex h-full items-center justify-center bg-muted rounded-t-lg">
             <span className="text-2xl text-muted-foreground">
               {item.name.charAt(0).toUpperCase()}
             </span>
@@ -93,41 +98,43 @@ export function GearItemCard({ item, onEdit, onDelete, preferredUnit }: GearItem
         </div>
       </div>
 
-      <CardContent className="p-4">
-        <div className="space-y-2">
-          <h3 className="font-semibold leading-none tracking-tight">
+      <CardContent className="p-3">
+        <div className="space-y-1">
+          <h3 className="font-semibold leading-tight tracking-tight text-sm">
             {item.name}
           </h3>
           {item.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-xs text-muted-foreground line-clamp-1">
               {item.description}
             </p>
           )}
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between p-4 pt-0">
-        <div className="flex items-center space-x-2">
-          <span className="text-lg font-bold">
+      <CardFooter className="flex items-center justify-between p-3 pt-0">
+        <div className="flex items-center space-x-1">
+          <span className="text-sm font-bold">
             <WeightDisplay
               grams={item.weight * item.quantity}
               preferredUnit={preferredUnit}
             />
           </span>
           {item.quantity > 1 && (
-            <Badge variant="outline">×{item.quantity}</Badge>
+            <Badge variant="outline" className="text-xs">
+              ×{item.quantity}
+            </Badge>
           )}
         </div>
 
         <div className="flex space-x-1">
           {item.isWorn && (
-            <Badge variant="outline" className="text-xs">
-              Worn
+            <Badge variant="outline" className="text-xs px-1">
+              W
             </Badge>
           )}
           {item.isConsumable && (
-            <Badge variant="outline" className="text-xs">
-              Consumable
+            <Badge variant="outline" className="text-xs px-1">
+              C
             </Badge>
           )}
         </div>

@@ -6,8 +6,6 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { useUserPreferences } from '@/contexts/user-preferences-context';
-
 import {
   Grid3X3,
   Package,
@@ -30,7 +28,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FloatingActionButton } from '@/components/ui/floating-action-button';
 import { TouchButton } from '@/components/ui/touch-friendly-button';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { useUserPreferences } from '@/contexts/user-preferences-context';
 import { useGear } from '@/hooks/use-gear';
+import type { GearItemWithCategory } from '@/types';
 
 type ViewMode = 'table' | 'grid' | 'mobile';
 
@@ -70,19 +70,23 @@ export default function GearPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Selection state for bulk operations
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   // Dialog state
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
+  const [editingItem, setEditingItem] = useState<GearItemWithCategory | null>(
+    null
+  );
   const [isUpdating, setIsUpdating] = useState(false);
   const [csvImportOpen, setCsvImportOpen] = useState(false);
 
-  // Enhanced filtering logic - MUST be before early returns to follow hooks rules
+  // Enhanced filtering and sorting logic - MUST be before early returns to follow hooks rules
   const filteredGearItems = useMemo(() => {
-    return gearItems.filter(item => {
+    const filtered = gearItems.filter(item => {
       // Search filter
       const matchesSearch =
         !searchTerm ||
@@ -103,7 +107,48 @@ export default function GearPage() {
 
       return matchesSearch && matchesCategory && matchesType;
     });
-  }, [gearItems, searchTerm, selectedCategory, selectedType]);
+
+    // Sort the filtered items
+    return filtered.sort((a, b) => {
+      let aValue: string | number, bValue: string | number;
+
+      switch (sortBy) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'weight':
+          aValue = a.weight;
+          bValue = b.weight;
+          break;
+        case 'totalWeight':
+          aValue = a.weight * a.quantity;
+          bValue = b.weight * b.quantity;
+          break;
+        case 'category':
+          aValue = a.category.name.toLowerCase();
+          bValue = b.category.name.toLowerCase();
+          break;
+        case 'createdAt':
+          aValue = new Date(a.createdAt);
+          bValue = new Date(b.createdAt);
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [
+    gearItems,
+    searchTerm,
+    selectedCategory,
+    selectedType,
+    sortBy,
+    sortOrder,
+  ]);
 
   if (status === 'loading') {
     return (
@@ -140,6 +185,8 @@ export default function GearPage() {
     setSearchTerm('');
     setSelectedCategory(null);
     setSelectedType(null);
+    setSortBy('createdAt');
+    setSortOrder('desc');
   };
 
   const handleItemsUpdated = () => {
@@ -147,14 +194,12 @@ export default function GearPage() {
     window.location.reload();
   };
 
-  const handleEdit = (item: any) => {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
+  const handleEdit = (item: GearItemWithCategory) => {
     setEditingItem(item);
     setEditDialogOpen(true);
   };
 
-  const handleUpdate = async (data: any) => {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
+  const handleUpdate = async (data: GearItemWithCategory) => {
     try {
       setIsUpdating(true);
       await updateGearItem(data.id, {
@@ -177,8 +222,7 @@ export default function GearPage() {
     }
   };
 
-  const handleDelete = async (item: any) => {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
+  const handleDelete = async (item: GearItemWithCategory) => {
     if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
       try {
         await deleteGearItem(item.id);
@@ -263,6 +307,10 @@ export default function GearPage() {
           onCategoryChange={setSelectedCategory}
           selectedType={selectedType}
           onTypeChange={setSelectedType}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          sortOrder={sortOrder}
+          onSortOrderChange={setSortOrder}
           categories={categories}
           hasActiveFilters={hasActiveFilters}
           onClearFilters={handleClearFilters}
@@ -333,8 +381,7 @@ export default function GearPage() {
               <div className="mb-4 text-sm text-muted-foreground">
                 {filteredGearItems.length} item
                 {filteredGearItems.length !== 1 ? 's' : ''}
-                {hasActiveFilters && ' (filtered)'}
-                • Total weight:{' '}
+                {hasActiveFilters && ' (filtered)'}• Total weight:{' '}
                 <WeightDisplay
                   grams={filteredGearItems.reduce(
                     (sum, item) => sum + item.weight * item.quantity,
@@ -361,8 +408,7 @@ export default function GearPage() {
               <div className="mb-4 text-sm text-muted-foreground">
                 {filteredGearItems.length} item
                 {filteredGearItems.length !== 1 ? 's' : ''}
-                {hasActiveFilters && ' (filtered)'}
-                • Total weight:{' '}
+                {hasActiveFilters && ' (filtered)'}• Total weight:{' '}
                 <WeightDisplay
                   grams={filteredGearItems.reduce(
                     (sum, item) => sum + item.weight * item.quantity,

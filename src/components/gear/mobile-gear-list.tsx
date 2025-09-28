@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import Image from 'next/image';
+
 import { Edit, ExternalLink, Package, Trash2, Weight } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +21,7 @@ interface GearItem {
   categoryId: string;
   isWorn: boolean;
   isConsumable: boolean;
+  imageUrl?: string;
   category: {
     name: string;
     color: string;
@@ -96,7 +99,18 @@ export function MobileGearList({
           className="bg-card border rounded-lg"
         >
           <div className="p-4">
-            <div className="flex items-start justify-between mb-2">
+            <div className="flex items-start gap-3 mb-3">
+              {item.imageUrl && (
+                <div className="flex-shrink-0 w-12 h-12 rounded-md overflow-hidden bg-muted">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    width={48}
+                    height={48}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium truncate">{item.name}</h3>
                 {item.description && (
@@ -138,10 +152,12 @@ export function MobileGearList({
                 </div>
                 {item.quantity > 1 && (
                   <div className="text-sm text-muted-foreground">
-                    {item.quantity}x <WeightDisplay
+                    {item.quantity}x{' '}
+                    <WeightDisplay
                       grams={item.weight}
                       preferredUnit={preferredUnit}
-                    /> each
+                    />{' '}
+                    each
                   </div>
                 )}
               </div>
