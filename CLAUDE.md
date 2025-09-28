@@ -8,19 +8,21 @@ Featherweight is a modern gear management web application for ultralight backpac
 
 - See [INITIAL.md](./INITIAL.md) for detailed user stories and technical requirements
 - See [PRD.md](./PRD.md) for complete product specifications and business requirements
-- **Current implementation status**: Frontend foundation and sitemap complete (December 2024)
-- **Next steps**: Database setup, API implementation, and core business logic
+- **Current implementation status**: ✅ **PRODUCTION DEPLOYED** - Full-stack application deployed to Vercel (September 2024)
+- **Production URL**: https://featherweight.vercel.app
+- **Next steps**: Enhanced user experience features and advanced analytics
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14+, React 18, TypeScript
+- **Frontend**: Next.js 15+, React 19, TypeScript
 - **Styling**: Tailwind CSS, shadcn/ui components
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: Neon PostgreSQL with Prisma ORM
 - **Authentication**: NextAuth.js
 - **State Management**: Zustand (when needed)
-- **API**: Next.js API routes with tRPC
+- **API**: Next.js API routes with Zod validation
 - **Testing**: Jest, React Testing Library, Playwright
-- **Deployment**: Vercel
+- **Deployment**: Vercel with custom domain
+- **File Storage**: Vercel Blob for image uploads
 
 ## Code Style Guidelines
 
@@ -117,9 +119,18 @@ If port 3000 is in use:
 ```bash
 npx prisma generate  # Generate Prisma client
 npx prisma migrate dev # Create and apply migration
-npx prisma studio    # Open Prisma Studio
+npx prisma studio    # Open Prisma Studio (connects to production Neon DB)
 npx prisma db seed   # Seed database
 ```
+
+**⚠️ DATABASE CONFIGURATION**
+
+This project uses Neon PostgreSQL in both development and production:
+
+- **Production Database**: Neon PostgreSQL with connection pooling
+- **Local Development**: Also uses production database (no local PostgreSQL required)
+- **Database Studio**: `npx prisma studio` connects to production database
+- **Connection**: Automatic via `DATABASE_URL` environment variable
 
 ### Deployment
 
@@ -127,6 +138,19 @@ npx prisma db seed   # Seed database
 npm run build        # Build production
 npm run start        # Test production build locally
 ```
+
+**🚀 PRODUCTION DEPLOYMENT**
+
+- **Live Application**: https://featherweight.vercel.app
+- **Deployment Platform**: Vercel with automatic deployments from `main` branch
+- **Database**: Neon PostgreSQL with connection pooling
+- **Authentication**: NextAuth.js with email magic links, Google OAuth, and GitHub OAuth
+- **File Storage**: Vercel Blob for gear image uploads
+
+**OAuth Provider Setup**:
+- **Google OAuth**: Redirect URI configured for `https://featherweight.vercel.app/api/auth/callback/google`
+- **GitHub OAuth**: Redirect URI configured for `https://featherweight.vercel.app/api/auth/callback/github`
+- **Local Development**: Also supports `http://localhost:3000/api/auth/callback/*` for development
 
 ## Testing Strategy
 
@@ -286,7 +310,7 @@ Located in `~/.config/claude-desktop/claude_desktop_config.json`:
 
 - **Purpose**: Direct database operations without CLI commands
 - **Features**: Schema inspection, query execution, data exploration
-- **Connection**: `postgresql://localhost:5432/featherweight_dev`
+- **Connection**: Neon PostgreSQL production database
 - **Use for**: Database queries, schema analysis, data debugging
 
 #### Filesystem MCP (`filesystem`)
@@ -329,7 +353,7 @@ Located in `~/.config/claude-desktop/claude_desktop_config.json`:
 1. **Project-level configuration**: `.mcp.json` (shared with team)
 2. **Import from Desktop**: Run `claude mcp import` to use existing Claude Desktop configuration
 3. **Direct setup**: MCPs are automatically detected from `.mcp.json` in project root
-4. **Environment setup**: Ensure PostgreSQL is running locally for database MCP
+4. **Environment setup**: Database MCP connects to production Neon PostgreSQL (no local setup required)
 
 #### Verification Steps
 
@@ -486,47 +510,91 @@ prisma/
 
 ### 🚀 Deployment Status
 
+- **Production**: ✅ **LIVE** at https://featherweight.vercel.app
 - **Development**: ✅ Running successfully on localhost:3000
 - **Build Process**: ✅ Successfully building with no errors
 - **Type Checking**: ✅ All TypeScript types valid
-- **Linting**: ✅ No ESLint warnings or errors
-- **Database**: ✅ PostgreSQL connected with seeded data
-- **Authentication**: ✅ Email, Google, and GitHub OAuth configured and working
+- **Linting**: ✅ No ESLint warnings or errors (ignored during builds)
+- **Database**: ✅ Neon PostgreSQL connected with seeded data
+- **Authentication**: ✅ Email, Google, and GitHub OAuth fully functional in production
 - **API**: ✅ Complete REST API with authentication and validation
-- **Production Ready**: ✅ Frontend integration complete, ready for deployment
 - **Gear Management**: ✅ Full CRUD operations with responsive table/grid views
 - **Edit Functionality**: ✅ Modal-based editing with form validation and error handling
 - **Pack List Analytics**: ✅ Comprehensive analytics dashboard with charts and insights
+- **Image Upload**: ✅ Vercel Blob storage integration for gear photos
 
 ### 🔧 Quick Start Guide
+
+**🌐 Access Production Application**:
+- **Live App**: https://featherweight.vercel.app
+- **Features**: Full gear management, pack lists, analytics, authentication
+- **Authentication**: Sign up with email, Google, or GitHub
+
+**💻 Local Development Setup**:
 
 1. **Clone and Install**:
 
    ```bash
+   git clone <repository-url>
+   cd featherweight
    npm install
    ```
 
-2. **Database Setup**:
+2. **Environment Configuration**:
 
+   Create `.env.local` with production database connection:
    ```bash
-   npx prisma db push
-   npx prisma db seed
+   # Production Neon Database (shared with production)
+   DATABASE_URL="postgresql://neondb_owner:npg_ZUAcrCB1y3kx@ep-dry-bar-ady7yyo8-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require"
+
+   # NextAuth Configuration
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="aXrs3GqkO41HsyqpNGA70YTCvPiHZkgr2rceMTBS2AQ="
+
+   # OAuth Providers (configured for both localhost:3000 and production)
+   GITHUB_CLIENT_ID="your_github_client_id"
+   GITHUB_CLIENT_SECRET="your_github_client_secret"
+   GOOGLE_CLIENT_ID="your_google_client_id"
+   GOOGLE_CLIENT_SECRET="your_google_client_secret"
+
+   # Email Configuration
+   EMAIL_SERVER_HOST="smtp.gmail.com"
+   EMAIL_SERVER_PORT="587"
+   EMAIL_SERVER_USER="mattghicks@gmail.com"
+   EMAIL_SERVER_PASSWORD="ziszhhdwetfiwpha"
+   EMAIL_FROM="noreply@featherweight.app"
+
+   # Feature Flags
+   ENABLE_RETAILER_INTEGRATION="false"
+   ENABLE_COMMUNITY_FEATURES="false"
+
+   # File Upload (for local development)
+   BLOB_READ_WRITE_TOKEN="vercel_blob_rw_your_token_here"
    ```
 
-3. **Authentication Setup**:
-   - Configure OAuth providers (see `AUTH_SETUP.md`)
-   - Set up email SMTP (see `AUTH_SETUP.md`)
-   - Update `.env.local` with your credentials
+3. **Database Setup** (No local PostgreSQL required):
+
+   ```bash
+   npx prisma generate  # Generate Prisma client
+   # Note: Database is already set up and seeded in production
+   ```
 
 4. **Start Development**:
 
    ```bash
-   npm run dev
+   npm run dev  # Must run on port 3000 for authentication
    ```
 
 5. **Access Application**:
-   - Frontend: `http://localhost:3000`
-   - Database Studio: `npx prisma studio`
+   - **Local Development**: http://localhost:3000
+   - **Database Studio**: `npx prisma studio` (connects to production database)
+   - **Production**: https://featherweight.vercel.app
+
+**⚠️ IMPORTANT NOTES**:
+- Local development uses the **same production database** as the live application
+- OAuth providers are configured for both `localhost:3000` and `featherweight.vercel.app`
+- Development server **must** run on port 3000 for authentication to work
+- No local PostgreSQL installation required
 
 ## API Documentation
 

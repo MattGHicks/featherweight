@@ -15,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { ImageUpload } from '@/components/ui/image-upload';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import {
@@ -25,7 +26,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ImageUpload } from '@/components/ui/image-upload';
 import type { Category, GearItem } from '@/types';
 
 const gearFormSchema = z.object({
@@ -207,7 +207,9 @@ export function GearForm({
               <FormLabel>Image</FormLabel>
               <div className="space-y-4">
                 <div>
-                  <FormLabel className="text-sm font-normal text-muted-foreground">Upload Image</FormLabel>
+                  <FormLabel className="text-sm font-normal text-muted-foreground">
+                    Upload Image
+                  </FormLabel>
                   <ImageUpload
                     value={field.value}
                     onChange={field.onChange}

@@ -1,11 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FileText, Mountain, Snowflake, Sun, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ChevronRight, FileText, Mountain, Snowflake, Sun } from 'lucide-react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatWeight } from '@/lib/utils';
 
@@ -43,18 +50,21 @@ interface TemplateSelectorProps {
 
 const seasonIcons = {
   '3-season': Mountain,
-  'Winter': Snowflake,
-  'Summer': Sun,
-  'All': Mountain,
+  Winter: Snowflake,
+  Summer: Sun,
+  All: Mountain,
 };
 
 const difficultyColors = {
-  'Beginner': 'bg-green-500',
-  'Intermediate': 'bg-yellow-500',
-  'Advanced': 'bg-red-500',
+  Beginner: 'bg-green-500',
+  Intermediate: 'bg-yellow-500',
+  Advanced: 'bg-red-500',
 };
 
-export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelectorProps) {
+export function TemplateSelector({
+  onTemplateSelect,
+  onClose,
+}: TemplateSelectorProps) {
   const [templates, setTemplates] = useState<PackListTemplate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -79,8 +89,10 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
   };
 
   const filteredTemplates = templates.filter(template => {
-    const categoryMatch = selectedCategory === 'all' || template.category === selectedCategory;
-    const seasonMatch = selectedSeason === 'all' || template.season === selectedSeason;
+    const categoryMatch =
+      selectedCategory === 'all' || template.category === selectedCategory;
+    const seasonMatch =
+      selectedSeason === 'all' || template.season === selectedSeason;
     return categoryMatch && seasonMatch;
   });
 
@@ -88,7 +100,10 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
   const seasons = [...new Set(templates.map(t => t.season))];
 
   const calculateTemplateWeight = (template: PackListTemplate) => {
-    return template.templateItems.reduce((sum, item) => sum + (item.estimatedWeight * item.quantity), 0);
+    return template.templateItems.reduce(
+      (sum, item) => sum + item.estimatedWeight * item.quantity,
+      0
+    );
   };
 
   if (isLoading) {
@@ -98,7 +113,9 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
           <CardTitle>Pack List Templates</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">Loading templates...</div>
+          <div className="text-center py-8 text-muted-foreground">
+            Loading templates...
+          </div>
         </CardContent>
       </Card>
     );
@@ -166,10 +183,14 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filteredTemplates.map((template) => {
-              const SeasonIcon = seasonIcons[template.season as keyof typeof seasonIcons] || Mountain;
+            {filteredTemplates.map(template => {
+              const SeasonIcon =
+                seasonIcons[template.season as keyof typeof seasonIcons] ||
+                Mountain;
               const totalWeight = calculateTemplateWeight(template);
-              const essentialItems = template.templateItems.filter(item => item.isEssential).length;
+              const essentialItems = template.templateItems.filter(
+                item => item.isEssential
+              ).length;
 
               return (
                 <Card
@@ -182,7 +203,9 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <SeasonIcon className="h-4 w-4" />
-                          <CardTitle className="text-lg">{template.name}</CardTitle>
+                          <CardTitle className="text-lg">
+                            {template.name}
+                          </CardTitle>
                         </div>
                         {template.description && (
                           <CardDescription className="line-clamp-2">
@@ -207,7 +230,9 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
 
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div className="text-center">
-                        <div className="font-semibold">{template.templateItems.length}</div>
+                        <div className="font-semibold">
+                          {template.templateItems.length}
+                        </div>
                         <div className="text-muted-foreground">Items</div>
                       </div>
                       <div className="text-center">
@@ -215,24 +240,52 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
                         <div className="text-muted-foreground">Essential</div>
                       </div>
                       <div className="text-center">
-                        <div className="font-semibold">{formatWeight(totalWeight)}</div>
+                        <div className="font-semibold">
+                          {formatWeight(totalWeight)}
+                        </div>
                         <div className="text-muted-foreground">Est. Weight</div>
                       </div>
                     </div>
 
                     <div className="pt-2">
-                      <div className="text-xs text-muted-foreground mb-2">Categories:</div>
+                      <div className="text-xs text-muted-foreground mb-2">
+                        Categories:
+                      </div>
                       <div className="flex flex-wrap gap-1">
-                        {[...new Set(template.templateItems.map(item => item.category.name))]
+                        {[
+                          ...new Set(
+                            template.templateItems.map(
+                              item => item.category.name
+                            )
+                          ),
+                        ]
                           .slice(0, 4)
                           .map(categoryName => (
-                            <Badge key={categoryName} variant="secondary" className="text-xs">
+                            <Badge
+                              key={categoryName}
+                              variant="secondary"
+                              className="text-xs"
+                            >
                               {categoryName}
                             </Badge>
                           ))}
-                        {[...new Set(template.templateItems.map(item => item.category.name))].length > 4 && (
+                        {[
+                          ...new Set(
+                            template.templateItems.map(
+                              item => item.category.name
+                            )
+                          ),
+                        ].length > 4 && (
                           <Badge variant="secondary" className="text-xs">
-                            +{[...new Set(template.templateItems.map(item => item.category.name))].length - 4} more
+                            +
+                            {[
+                              ...new Set(
+                                template.templateItems.map(
+                                  item => item.category.name
+                                )
+                              ),
+                            ].length - 4}{' '}
+                            more
                           </Badge>
                         )}
                       </div>
@@ -245,8 +298,8 @@ export function TemplateSelector({ onTemplateSelect, onClose }: TemplateSelector
         )}
 
         <div className="text-center text-sm text-muted-foreground">
-          Templates help you get started quickly with proven gear lists for different trip types.
-          You can customize any template after selection.
+          Templates help you get started quickly with proven gear lists for
+          different trip types. You can customize any template after selection.
         </div>
       </CardContent>
     </Card>

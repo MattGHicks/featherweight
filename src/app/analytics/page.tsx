@@ -1,20 +1,27 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-import { BarChart3, TrendingUp, Target, Scale } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { redirect } from 'next/navigation';
 
-import { PageHeader } from '@/components/layout/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { WeightDistributionChart } from '@/components/analytics/weight-distribution-chart';
+import { BarChart3, Scale, Target, TrendingUp } from 'lucide-react';
+
 import { CategoryBreakdownChart } from '@/components/analytics/category-breakdown-chart';
-import { WeightTrendsChart } from '@/components/analytics/weight-trends-chart';
 import { PackListComparison } from '@/components/analytics/pack-list-comparison';
+import { WeightDistributionChart } from '@/components/analytics/weight-distribution-chart';
 import { WeightGoals } from '@/components/analytics/weight-goals';
-import { formatWeight } from '@/lib/utils';
+import { WeightTrendsChart } from '@/components/analytics/weight-trends-chart';
+import { PageHeader } from '@/components/layout/page-header';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 interface AnalyticsData {
   totalGearItems: number;
@@ -107,7 +114,9 @@ export default function AnalyticsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <BarChart3 className="h-16 w-16 text-muted-foreground mb-6" />
-            <h3 className="text-lg font-semibold mb-2">Unable to load analytics</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Unable to load analytics
+            </h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm">
               {error}
             </p>
@@ -131,7 +140,9 @@ export default function AnalyticsPage() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">
             <BarChart3 className="h-16 w-16 text-muted-foreground mb-6" />
-            <h3 className="text-lg font-semibold mb-2">No data to analyze yet</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              No data to analyze yet
+            </h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm">
               Add gear items and create pack lists to see detailed weight
               analytics and optimization insights.
@@ -163,7 +174,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatWeight(analytics.averageBaseWeight)}
+              <WeightDisplay grams={analytics.averageBaseWeight} />
             </div>
             <CardDescription>
               Across {analytics.totalPackLists} pack lists
@@ -180,7 +191,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {formatWeight(analytics.lightestBaseWeight)}
+              <WeightDisplay grams={analytics.lightestBaseWeight} />
             </div>
             <CardDescription>Your personal best</CardDescription>
           </CardContent>
@@ -239,7 +250,10 @@ export default function AnalyticsPage() {
 
         <TabsContent value="categories" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <CategoryBreakdownChart data={analytics.categoryBreakdown} detailed />
+            <CategoryBreakdownChart
+              data={analytics.categoryBreakdown}
+              detailed
+            />
             <Card>
               <CardHeader>
                 <CardTitle>Heaviest Items by Category</CardTitle>
@@ -250,7 +264,10 @@ export default function AnalyticsPage() {
               <CardContent>
                 <div className="space-y-4">
                   {analytics.topHeaviestItems.map((item, index) => (
-                    <div key={item.name} className="flex items-center justify-between">
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between"
+                    >
                       <div className="space-y-1">
                         <div className="font-medium">{item.name}</div>
                         <div className="text-sm text-muted-foreground">
@@ -258,7 +275,7 @@ export default function AnalyticsPage() {
                         </div>
                       </div>
                       <div className="text-lg font-bold">
-                        {formatWeight(item.weight)}
+                        <WeightDisplay grams={item.weight} />
                       </div>
                     </div>
                   ))}

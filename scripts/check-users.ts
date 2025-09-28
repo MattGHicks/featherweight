@@ -10,16 +10,20 @@ async function checkUsers() {
         email: true,
         name: true,
         createdAt: true,
-      }
+      },
     });
 
     console.log(`Found ${users.length} users:`);
     users.forEach(user => {
-      console.log(`- ID: ${user.id}, Email: ${user.email}, Name: ${user.name}, Created: ${user.createdAt}`);
+      console.log(
+        `- ID: ${user.id}, Email: ${user.email}, Name: ${user.name}, Created: ${user.createdAt}`
+      );
     });
 
     if (users.length === 0) {
-      console.log('\nNo users found. You need to sign up first through the app.');
+      console.log(
+        '\nNo users found. You need to sign up first through the app.'
+      );
     }
   } catch (error) {
     console.error('Error checking users:', error);

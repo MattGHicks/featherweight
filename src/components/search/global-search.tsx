@@ -1,9 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Search, Package, List, Target, Filter } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
+import { Filter, List, Package, Search, Target } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandDialog,
@@ -13,8 +17,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { formatWeight } from '@/lib/utils';
 
 interface SearchResult {
@@ -45,7 +47,7 @@ export function GlobalSearch({ trigger }: GlobalSearchProps) {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen(open => !open);
       }
     };
 
@@ -62,7 +64,9 @@ export function GlobalSearch({ trigger }: GlobalSearchProps) {
     const searchTimeout = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const response = await fetch(
+          `/api/search?q=${encodeURIComponent(query)}`
+        );
         if (response.ok) {
           const data = await response.json();
           setResults(data.results || []);
@@ -104,9 +108,7 @@ export function GlobalSearch({ trigger }: GlobalSearchProps) {
 
   return (
     <>
-      <div onClick={() => setOpen(true)}>
-        {trigger || defaultTrigger}
-      </div>
+      <div onClick={() => setOpen(true)}>{trigger || defaultTrigger}</div>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
@@ -130,7 +132,7 @@ export function GlobalSearch({ trigger }: GlobalSearchProps) {
                 <CommandGroup heading="Gear Items">
                   {results
                     .filter(r => r.type === 'gear')
-                    .map((result) => (
+                    .map(result => (
                       <CommandItem
                         key={`gear-${result.id}`}
                         onSelect={() => handleSelect(result)}
@@ -169,7 +171,7 @@ export function GlobalSearch({ trigger }: GlobalSearchProps) {
                 <CommandGroup heading="Pack Lists">
                   {results
                     .filter(r => r.type === 'pack-list')
-                    .map((result) => (
+                    .map(result => (
                       <CommandItem
                         key={`pack-list-${result.id}`}
                         onSelect={() => handleSelect(result)}

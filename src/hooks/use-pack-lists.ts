@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 
 interface PackListStats {
@@ -81,7 +82,10 @@ export function usePackLists() {
     return newPackList;
   };
 
-  const updatePackList = async (id: string, data: Partial<CreatePackList>): Promise<PackList> => {
+  const updatePackList = async (
+    id: string,
+    data: Partial<CreatePackList>
+  ): Promise<PackList> => {
     const response = await fetch(`/api/pack-lists/${id}`, {
       method: 'PATCH',
       headers: {
@@ -96,7 +100,9 @@ export function usePackLists() {
     }
 
     const updatedPackList = await response.json();
-    setPackLists(prev => prev.map(list => list.id === id ? updatedPackList : list));
+    setPackLists(prev =>
+      prev.map(list => (list.id === id ? updatedPackList : list))
+    );
     return updatedPackList;
   };
 

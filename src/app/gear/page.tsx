@@ -1,32 +1,47 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
+
 import { useSession } from 'next-auth/react';
-import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { Package, Plus, Table as TableIcon, Grid3X3, Upload, Smartphone } from 'lucide-react';
+import {
+  Grid3X3,
+  Package,
+  Plus,
+  Smartphone,
+  Table as TableIcon,
+  Upload,
+} from 'lucide-react';
 
+import { BulkOperations } from '@/components/gear/bulk-operations';
+import { CSVImportDialog } from '@/components/gear/csv-import-dialog';
+import { GearEditDialog } from '@/components/gear/gear-edit-dialog';
+import { GearFilters } from '@/components/gear/gear-filters';
+import { GearItemCard } from '@/components/gear/gear-item-card';
+import { GearTable } from '@/components/gear/gear-table';
+import { MobileGearList } from '@/components/gear/mobile-gear-list';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { GearTable } from '@/components/gear/gear-table';
-import { GearFilters } from '@/components/gear/gear-filters';
-import { GearItemCard } from '@/components/gear/gear-item-card';
-import { GearEditDialog } from '@/components/gear/gear-edit-dialog';
-import { CSVImportDialog } from '@/components/gear/csv-import-dialog';
-import { BulkOperations } from '@/components/gear/bulk-operations';
-import { MobileGearList } from '@/components/gear/mobile-gear-list';
 import { FloatingActionButton } from '@/components/ui/floating-action-button';
 import { TouchButton } from '@/components/ui/touch-friendly-button';
-import { useGear } from '@/hooks/use-gear';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { useGear } from '@/hooks/use-gear';
 
 type ViewMode = 'table' | 'grid' | 'mobile';
 
 export default function GearPage() {
   const { data: session, status } = useSession();
-  const { gearItems, categories, isLoading, error, deleteGearItem, updateGearItem } = useGear();
+  const {
+    gearItems,
+    categories,
+    isLoading,
+    error,
+    deleteGearItem,
+    updateGearItem,
+  } = useGear();
 
   // Mobile detection
   const [isMobile, setIsMobile] = useState(false);
@@ -58,7 +73,7 @@ export default function GearPage() {
 
   // Dialog state
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const [isUpdating, setIsUpdating] = useState(false);
   const [csvImportOpen, setCsvImportOpen] = useState(false);
 
@@ -66,16 +81,19 @@ export default function GearPage() {
   const filteredGearItems = useMemo(() => {
     return gearItems.filter(item => {
       // Search filter
-      const matchesSearch = !searchTerm ||
+      const matchesSearch =
+        !searchTerm ||
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.category.name.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Category filter
-      const matchesCategory = !selectedCategory || item.category.id === selectedCategory;
+      const matchesCategory =
+        !selectedCategory || item.category.id === selectedCategory;
 
       // Type filter
-      const matchesType = !selectedType ||
+      const matchesType =
+        !selectedType ||
         (selectedType === 'base' && !item.isWorn && !item.isConsumable) ||
         (selectedType === 'worn' && item.isWorn) ||
         (selectedType === 'consumable' && item.isConsumable);
@@ -127,11 +145,13 @@ export default function GearPage() {
   };
 
   const handleEdit = (item: any) => {
+    // eslint-disable-line @typescript-eslint/no-explicit-any
     setEditingItem(item);
     setEditDialogOpen(true);
   };
 
   const handleUpdate = async (data: any) => {
+    // eslint-disable-line @typescript-eslint/no-explicit-any
     try {
       setIsUpdating(true);
       await updateGearItem(data.id, {
@@ -155,6 +175,7 @@ export default function GearPage() {
   };
 
   const handleDelete = async (item: any) => {
+    // eslint-disable-line @typescript-eslint/no-explicit-any
     if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
       try {
         await deleteGearItem(item.id);
@@ -269,9 +290,8 @@ export default function GearPage() {
             </h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm">
               {hasActiveFilters
-                ? 'Try adjusting your filters to find what you\'re looking for.'
-                : 'Start building your gear library by adding your first item. Track weights, categories, and more.'
-              }
+                ? "Try adjusting your filters to find what you're looking for."
+                : 'Start building your gear library by adding your first item. Track weights, categories, and more.'}
             </p>
             {hasActiveFilters ? (
               <Button onClick={handleClearFilters} variant="outline">
@@ -307,14 +327,21 @@ export default function GearPage() {
           ) : viewMode === 'mobile' ? (
             <>
               <div className="mb-4 text-sm text-muted-foreground">
-                {filteredGearItems.length} item{filteredGearItems.length !== 1 ? 's' : ''}
+                {filteredGearItems.length} item
+                {filteredGearItems.length !== 1 ? 's' : ''}
                 {hasActiveFilters && ' (filtered)'}
-                • Total weight: <WeightDisplay grams={filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0)} />
+                • Total weight:{' '}
+                <WeightDisplay
+                  grams={filteredGearItems.reduce(
+                    (sum, item) => sum + item.weight * item.quantity,
+                    0
+                  )}
+                />
               </div>
               <MobileGearList
                 items={filteredGearItems}
                 onEdit={handleEdit}
-                onDelete={async (id) => {
+                onDelete={async id => {
                   const item = filteredGearItems.find(item => item.id === id);
                   if (item) {
                     await handleDelete(item);
@@ -326,9 +353,16 @@ export default function GearPage() {
           ) : (
             <>
               <div className="mb-4 text-sm text-muted-foreground">
-                {filteredGearItems.length} item{filteredGearItems.length !== 1 ? 's' : ''}
+                {filteredGearItems.length} item
+                {filteredGearItems.length !== 1 ? 's' : ''}
                 {hasActiveFilters && ' (filtered)'}
-                • Total weight: <WeightDisplay grams={filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0)} />
+                • Total weight:{' '}
+                <WeightDisplay
+                  grams={filteredGearItems.reduce(
+                    (sum, item) => sum + item.weight * item.quantity,
+                    0
+                  )}
+                />
               </div>
               <div
                 className="grid gap-6"
@@ -336,7 +370,7 @@ export default function GearPage() {
                   gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                 }}
               >
-                {filteredGearItems.map((item) => (
+                {filteredGearItems.map(item => (
                   <GearItemCard
                     key={item.id}
                     item={item}
@@ -383,7 +417,7 @@ export default function GearPage() {
               variant: 'secondary',
             },
           ]}
-          mainAction={() => window.location.href = '/gear/new'}
+          mainAction={() => (window.location.href = '/gear/new')}
         />
       )}
     </div>

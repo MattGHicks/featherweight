@@ -13,38 +13,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { WeightDisplay } from '@/components/ui/weight-display';
 import type { GearItemWithCategory } from '@/types';
 
 interface GearItemCardProps {
   item: GearItemWithCategory;
   onEdit?: (item: GearItemWithCategory) => void;
   onDelete?: (item: GearItemWithCategory) => void;
-  units?: 'metric' | 'imperial';
 }
 
-export function GearItemCard({
-  item,
-  onEdit,
-  onDelete,
-  units = 'imperial',
-}: GearItemCardProps) {
-  const formatWeight = (grams: number) => {
-    if (units === 'metric') {
-      if (grams >= 1000) {
-        return `${(grams / 1000).toFixed(1)} kg`;
-      }
-      return `${grams.toFixed(0)} g`;
-    } else {
-      const ounces = grams * 0.035274;
-      if (ounces >= 16) {
-        const pounds = Math.floor(ounces / 16);
-        const remainingOunces = ounces % 16;
-        return `${pounds} lb ${remainingOunces.toFixed(1)} oz`;
-      }
-      return `${ounces.toFixed(1)} oz`;
-    }
-  };
-
+export function GearItemCard({ item, onEdit, onDelete }: GearItemCardProps) {
   return (
     <Card className="group overflow-hidden transition-all hover:shadow-md">
       <div className="relative aspect-square">
@@ -129,7 +107,7 @@ export function GearItemCard({
       <CardFooter className="flex items-center justify-between p-4 pt-0">
         <div className="flex items-center space-x-2">
           <span className="text-lg font-bold">
-            {formatWeight(item.weight * item.quantity)}
+            <WeightDisplay grams={item.weight * item.quantity} />
           </span>
           {item.quantity > 1 && (
             <Badge variant="outline">×{item.quantity}</Badge>

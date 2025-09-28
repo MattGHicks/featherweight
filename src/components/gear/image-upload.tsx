@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { useRef, useState } from 'react';
+
+import { Image as ImageIcon, Upload, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,7 +24,8 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB limit
       alert('Image must be smaller than 5MB');
       return;
     }
@@ -145,7 +147,9 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
   return (
     <Card
       className={`border-2 border-dashed transition-colors cursor-pointer ${
-        dragActive ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'
+        dragActive
+          ? 'border-primary bg-primary/5'
+          : 'border-muted-foreground/25'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={!disabled && !isUploading ? handleClick : undefined}
       onDrag={handleDrag}
@@ -169,8 +173,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
           <p className="text-sm text-muted-foreground mb-4">
             {isUploading
               ? 'Please wait while your image is being uploaded'
-              : 'Drag and drop an image here, or click to browse'
-            }
+              : 'Drag and drop an image here, or click to browse'}
           </p>
 
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -178,11 +181,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
           </div>
 
           {!isUploading && (
-            <Button
-              variant="outline"
-              className="mt-4"
-              disabled={disabled}
-            >
+            <Button variant="outline" className="mt-4" disabled={disabled}>
               <Upload className="w-4 h-4 mr-2" />
               Choose File
             </Button>

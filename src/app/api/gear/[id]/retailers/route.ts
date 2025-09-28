@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { z } from 'zod';
 
 import { authOptions } from '@/lib/auth';
@@ -31,7 +32,10 @@ export async function POST(
     });
 
     if (!gearItem || gearItem.userId !== session.user.id) {
-      return NextResponse.json({ error: 'Gear item not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Gear item not found' },
+        { status: 404 }
+      );
     }
 
     const body = await request.json();
@@ -92,7 +96,10 @@ export async function GET(
     });
 
     if (!gearItem || gearItem.userId !== session.user.id) {
-      return NextResponse.json({ error: 'Gear item not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Gear item not found' },
+        { status: 404 }
+      );
     }
 
     const retailerLinks = await prisma.retailerLink.findMany({

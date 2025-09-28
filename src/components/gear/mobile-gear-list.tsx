@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Edit, Trash2, ExternalLink, Weight, Package } from 'lucide-react';
+
+import { Edit, ExternalLink, Package, Trash2, Weight } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import { SwipeCard } from '@/components/ui/swipe-card';
 import { TouchButton } from '@/components/ui/touch-friendly-button';
-import { Badge } from '@/components/ui/badge';
-import { formatWeight } from '@/lib/utils';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 interface GearItem {
   id: string;
@@ -30,7 +32,12 @@ interface MobileGearListProps {
   isLoading?: boolean;
 }
 
-export function MobileGearList({ items, onEdit, onDelete, isLoading }: MobileGearListProps) {
+export function MobileGearList({
+  items,
+  onEdit,
+  onDelete,
+  isLoading,
+}: MobileGearListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -45,7 +52,7 @@ export function MobileGearList({ items, onEdit, onDelete, isLoading }: MobileGea
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[1, 2, 3, 4, 5].map((i) => (
+        {[1, 2, 3, 4, 5].map(i => (
           <div key={i} className="animate-pulse">
             <div className="bg-muted h-20 rounded-lg" />
           </div>
@@ -68,7 +75,7 @@ export function MobileGearList({ items, onEdit, onDelete, isLoading }: MobileGea
 
   return (
     <div className="space-y-2">
-      {items.map((item) => (
+      {items.map(item => (
         <SwipeCard
           key={item.id}
           onSwipeLeft={() => handleDelete(item.id)}
@@ -119,11 +126,13 @@ export function MobileGearList({ items, onEdit, onDelete, isLoading }: MobileGea
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1 text-sm">
                   <Weight className="h-3 w-3" />
-                  <span className="font-medium">{formatWeight(item.weight * item.quantity)}</span>
+                  <span className="font-medium">
+                    <WeightDisplay grams={item.weight * item.quantity} />
+                  </span>
                 </div>
                 {item.quantity > 1 && (
                   <div className="text-sm text-muted-foreground">
-                    {item.quantity}x {formatWeight(item.weight)} each
+                    {item.quantity}x <WeightDisplay grams={item.weight} /> each
                   </div>
                 )}
               </div>
@@ -133,7 +142,7 @@ export function MobileGearList({ items, onEdit, onDelete, isLoading }: MobileGea
                   variant="outline"
                   style={{
                     borderColor: item.category.color,
-                    color: item.category.color
+                    color: item.category.color,
                   }}
                   className="text-xs"
                 >

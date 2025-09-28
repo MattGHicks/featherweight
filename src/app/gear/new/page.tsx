@@ -1,15 +1,16 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 import { ArrowLeft } from 'lucide-react';
 
+import { GearForm } from '@/components/gear/gear-form';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
-import { GearForm } from '@/components/gear/gear-form';
 import { useGear } from '@/hooks/use-gear';
 
 export default function NewGearPage() {

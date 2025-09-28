@@ -1,8 +1,9 @@
 'use client';
 
 import { forwardRef } from 'react';
+
 import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
 
@@ -11,11 +12,16 @@ const touchButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow hover:bg-primary/90 active:bg-primary/95',
-        destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive/95',
-        outline: 'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent/90',
-        secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:bg-secondary/90',
-        ghost: 'hover:bg-accent hover:text-accent-foreground active:bg-accent/90',
+        default:
+          'bg-primary text-primary-foreground shadow hover:bg-primary/90 active:bg-primary/95',
+        destructive:
+          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive/95',
+        outline:
+          'border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent/90',
+        secondary:
+          'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:bg-secondary/90',
+        ghost:
+          'hover:bg-accent hover:text-accent-foreground active:bg-accent/90',
         link: 'text-primary underline-offset-4 hover:underline active:text-primary/90',
       },
       size: {

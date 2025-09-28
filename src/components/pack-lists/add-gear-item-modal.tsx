@@ -1,8 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search, Plus } from 'lucide-react';
 
+import { Plus, Search } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -11,10 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -134,7 +135,7 @@ export function AddGearItemModal({
     setIsSubmitting(true);
 
     try {
-      const promises = Array.from(selectedItems).map(async (gearItemId) => {
+      const promises = Array.from(selectedItems).map(async gearItemId => {
         const response = await fetch(`/api/pack-lists/${packListId}/items`, {
           method: 'POST',
           headers: {
@@ -171,12 +172,14 @@ export function AddGearItemModal({
 
   // Filter gear items based on search and category
   const filteredGearItems = gearItems.filter(item => {
-    const matchesSearch = !searchTerm ||
+    const matchesSearch =
+      !searchTerm ||
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.category.name.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesCategory = selectedCategory === 'all' || item.category.id === selectedCategory;
+    const matchesCategory =
+      selectedCategory === 'all' || item.category.id === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -200,11 +203,14 @@ export function AddGearItemModal({
                 placeholder="Search gear items..."
                 className="pl-8"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="w-48">
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
@@ -223,7 +229,8 @@ export function AddGearItemModal({
           {/* Selected Items Count */}
           {selectedItems.size > 0 && (
             <div className="text-sm text-muted-foreground">
-              {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''} selected
+              {selectedItems.size} item{selectedItems.size !== 1 ? 's' : ''}{' '}
+              selected
             </div>
           )}
 
@@ -231,15 +238,16 @@ export function AddGearItemModal({
           <div className="flex-1 overflow-auto border rounded-lg">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="text-muted-foreground">Loading gear items...</div>
+                <div className="text-muted-foreground">
+                  Loading gear items...
+                </div>
               </div>
             ) : filteredGearItems.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <p className="text-muted-foreground mb-2">
                   {searchTerm || selectedCategory !== 'all'
                     ? 'No gear items match your filters'
-                    : 'No gear items found'
-                  }
+                    : 'No gear items found'}
                 </p>
                 {!searchTerm && selectedCategory === 'all' && (
                   <p className="text-sm text-muted-foreground">
@@ -262,7 +270,9 @@ export function AddGearItemModal({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between">
                         <div className="space-y-1 flex-1 min-w-0">
-                          <div className="font-medium truncate">{item.name}</div>
+                          <div className="font-medium truncate">
+                            {item.name}
+                          </div>
                           {item.description && (
                             <div className="text-sm text-muted-foreground line-clamp-2">
                               {item.description}
@@ -321,7 +331,8 @@ export function AddGearItemModal({
             ) : (
               <>
                 <Plus className="mr-2 h-4 w-4" />
-                Add {selectedItems.size} Item{selectedItems.size !== 1 ? 's' : ''}
+                Add {selectedItems.size} Item
+                {selectedItems.size !== 1 ? 's' : ''}
               </>
             )}
           </Button>

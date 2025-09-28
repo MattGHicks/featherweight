@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Format results
-    const gearResults = gearItems.map((item) => ({
+    const gearResults = gearItems.map(item => ({
       id: item.id,
       type: 'gear' as const,
       title: item.name,
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    const packListResults = packLists.map((list) => {
+    const packListResults = packLists.map(list => {
       const includedItems = list.items.filter((item: any) => item.isIncluded);
       const totalWeight = includedItems.reduce(
         (sum: number, item: any) => sum + item.gearItem.weight * item.quantity,
@@ -110,9 +110,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ results });
   } catch (error) {
     console.error('Search error:', error);
-    return NextResponse.json(
-      { error: 'Failed to search' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to search' }, { status: 500 });
   }
 }

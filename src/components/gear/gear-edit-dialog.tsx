@@ -7,15 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import type { Category, GearItemWithCategory } from '@/types';
+
 import { GearForm } from './gear-form';
-import type { Category, GearItem, GearItemWithCategory } from '@/types';
 
 interface GearEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
   gearItem: GearItemWithCategory | null;
   categories: Category[];
-  onSubmit: (data: any) => Promise<void>;
+  onSubmit: (data: GearItemWithCategory) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -29,7 +30,7 @@ export function GearEditDialog({
 }: GearEditDialogProps) {
   if (!gearItem) return null;
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: GearItemWithCategory) => {
     await onSubmit({ ...data, id: gearItem.id });
     onClose();
   };
@@ -40,7 +41,7 @@ export function GearEditDialog({
         <DialogHeader>
           <DialogTitle>Edit Gear Item</DialogTitle>
           <DialogDescription>
-            Update the details for "{gearItem.name}"
+            Update the details for &quot;{gearItem.name}&quot;
           </DialogDescription>
         </DialogHeader>
 

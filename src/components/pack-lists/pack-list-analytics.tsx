@@ -1,25 +1,32 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Weight, Package, TrendingUp, Target, Zap, Scale } from 'lucide-react';
+
+import { Package, Scale, Target, TrendingUp, Weight, Zap } from 'lucide-react';
 import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
 } from 'recharts';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { formatWeight } from '@/lib/utils';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 interface GearItem {
   id: string;
@@ -49,47 +56,56 @@ interface PackListAnalyticsProps {
   };
 }
 
-export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) {
+export function PackListAnalytics({
+  items,
+  userGoals,
+}: PackListAnalyticsProps) {
   const analytics = useMemo(() => {
     const includedItems = items.filter(item => item.isIncluded);
 
     // Calculate weights
     const totalWeight = includedItems.reduce(
-      (sum, item) => sum + (item.gearItem.weight * item.quantity),
+      (sum, item) => sum + item.gearItem.weight * item.quantity,
       0
     );
 
     const baseWeight = includedItems
       .filter(item => !item.gearItem.isWorn && !item.gearItem.isConsumable)
-      .reduce((sum, item) => sum + (item.gearItem.weight * item.quantity), 0);
+      .reduce((sum, item) => sum + item.gearItem.weight * item.quantity, 0);
 
     const wornWeight = includedItems
       .filter(item => item.gearItem.isWorn)
-      .reduce((sum, item) => sum + (item.gearItem.weight * item.quantity), 0);
+      .reduce((sum, item) => sum + item.gearItem.weight * item.quantity, 0);
 
     const consumableWeight = includedItems
       .filter(item => item.gearItem.isConsumable)
-      .reduce((sum, item) => sum + (item.gearItem.weight * item.quantity), 0);
+      .reduce((sum, item) => sum + item.gearItem.weight * item.quantity, 0);
 
     // Category breakdown
-    const categoryBreakdown = includedItems.reduce((acc, item) => {
-      const categoryName = item.gearItem.category.name;
-      const weight = item.gearItem.weight * item.quantity;
+    const categoryBreakdown = includedItems.reduce(
+      (acc, item) => {
+        const categoryName = item.gearItem.category.name;
+        const weight = item.gearItem.weight * item.quantity;
 
-      if (!acc[categoryName]) {
-        acc[categoryName] = {
-          name: categoryName,
-          weight: 0,
-          itemCount: 0,
-          color: item.gearItem.category.color,
-        };
-      }
+        if (!acc[categoryName]) {
+          acc[categoryName] = {
+            name: categoryName,
+            weight: 0,
+            itemCount: 0,
+            color: item.gearItem.category.color,
+          };
+        }
 
-      acc[categoryName].weight += weight;
-      acc[categoryName].itemCount += 1;
+        acc[categoryName].weight += weight;
+        acc[categoryName].itemCount += 1;
 
-      return acc;
-    }, {} as Record<string, { name: string; weight: number; itemCount: number; color: string }>);
+        return acc;
+      },
+      {} as Record<
+        string,
+        { name: string; weight: number; itemCount: number; color: string }
+      >
+    );
 
     const categoryData = Object.values(categoryBreakdown)
       .sort((a, b) => b.weight - a.weight)
@@ -139,8 +155,14 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
     };
   };
 
-  const baseGoalProgress = getGoalProgress(analytics.baseWeight, userGoals?.baseWeightGoal);
-  const totalGoalProgress = getGoalProgress(analytics.totalWeight, userGoals?.totalWeightGoal);
+  const baseGoalProgress = getGoalProgress(
+    analytics.baseWeight,
+    userGoals?.baseWeightGoal
+  );
+  const totalGoalProgress = getGoalProgress(
+    analytics.totalWeight,
+    userGoals?.totalWeightGoal
+  );
 
   return (
     <div className="space-y-6">
@@ -152,15 +174,20 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
             <Weight className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatWeight(analytics.totalWeight)}</div>
+            <div className="text-2xl font-bold">
+              <WeightDisplay grams={analytics.totalWeight} />
+            </div>
             {totalGoalProgress && (
               <div className="mt-2">
                 <Progress
                   value={totalGoalProgress.percentage}
                   className={`h-2 ${totalGoalProgress.isOverGoal ? 'bg-red-100' : 'bg-green-100'}`}
                 />
-                <p className={`text-xs mt-1 ${totalGoalProgress.isOverGoal ? 'text-red-600' : 'text-green-600'}`}>
-                  {totalGoalProgress.isOverGoal ? 'Over' : 'Under'} goal by {formatWeight(totalGoalProgress.difference)}
+                <p
+                  className={`text-xs mt-1 ${totalGoalProgress.isOverGoal ? 'text-red-600' : 'text-green-600'}`}
+                >
+                  {totalGoalProgress.isOverGoal ? 'Over' : 'Under'} goal by{' '}
+                  <WeightDisplay grams={totalGoalProgress.difference} />
                 </p>
               </div>
             )}
@@ -173,15 +200,20 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatWeight(analytics.baseWeight)}</div>
+            <div className="text-2xl font-bold">
+              <WeightDisplay grams={analytics.baseWeight} />
+            </div>
             {baseGoalProgress && (
               <div className="mt-2">
                 <Progress
                   value={baseGoalProgress.percentage}
                   className={`h-2 ${baseGoalProgress.isOverGoal ? 'bg-red-100' : 'bg-green-100'}`}
                 />
-                <p className={`text-xs mt-1 ${baseGoalProgress.isOverGoal ? 'text-red-600' : 'text-green-600'}`}>
-                  {baseGoalProgress.isOverGoal ? 'Over' : 'Under'} goal by {formatWeight(baseGoalProgress.difference)}
+                <p
+                  className={`text-xs mt-1 ${baseGoalProgress.isOverGoal ? 'text-red-600' : 'text-green-600'}`}
+                >
+                  {baseGoalProgress.isOverGoal ? 'Over' : 'Under'} goal by{' '}
+                  <WeightDisplay grams={baseGoalProgress.difference} />
                 </p>
               </div>
             )}
@@ -194,9 +226,14 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatWeight(analytics.wornWeight)}</div>
+            <div className="text-2xl font-bold">
+              <WeightDisplay grams={analytics.wornWeight} />
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {((analytics.wornWeight / analytics.totalWeight) * 100).toFixed(1)}% of total
+              {((analytics.wornWeight / analytics.totalWeight) * 100).toFixed(
+                1
+              )}
+              % of total
             </p>
           </CardContent>
         </Card>
@@ -209,7 +246,11 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
           <CardContent>
             <div className="text-2xl font-bold">{analytics.itemCount}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Avg: {formatWeight(analytics.totalWeight / analytics.itemCount)} per item
+              Avg:{' '}
+              <WeightDisplay
+                grams={analytics.totalWeight / analytics.itemCount}
+              />{' '}
+              per item
             </p>
           </CardContent>
         </Card>
@@ -242,7 +283,10 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: number) => [formatWeight(value), 'Weight']}
+                    formatter={(value: number) => [
+                      `${(value / 1000).toFixed(2)}kg`,
+                      'Weight',
+                    ]}
                   />
                   <Legend />
                 </PieChart>
@@ -261,8 +305,11 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {analytics.categoryData.slice(0, 6).map((category) => (
-                <div key={category.name} className="flex items-center justify-between">
+              {analytics.categoryData.slice(0, 6).map(category => (
+                <div
+                  key={category.name}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-2">
                     <div
                       className="w-3 h-3 rounded-full"
@@ -274,8 +321,12 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
                     </Badge>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-medium">{formatWeight(category.weight)}</div>
-                    <div className="text-xs text-muted-foreground">{category.percentage}%</div>
+                    <div className="text-sm font-medium">
+                      <WeightDisplay grams={category.weight} />
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {category.percentage}%
+                    </div>
                   </div>
                 </div>
               ))}
@@ -295,7 +346,10 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
         <CardContent>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics.categoryData.slice(0, 8)} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <BarChart
+                data={analytics.categoryData.slice(0, 8)}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
                   dataKey="name"
@@ -305,17 +359,16 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
                   interval={0}
                 />
                 <YAxis
-                  tickFormatter={(value) => `${(value / 1000).toFixed(1)}kg`}
+                  tickFormatter={value => `${(value / 1000).toFixed(1)}kg`}
                 />
                 <Tooltip
-                  formatter={(value: number) => [formatWeight(value), 'Weight']}
-                  labelFormatter={(label) => `Category: ${label}`}
+                  formatter={(value: number) => [
+                    `${(value / 1000).toFixed(2)}kg`,
+                    'Weight',
+                  ]}
+                  labelFormatter={label => `Category: ${label}`}
                 />
-                <Bar
-                  dataKey="weight"
-                  fill="#3b82f6"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="weight" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -336,7 +389,10 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
         <CardContent>
           <div className="space-y-3">
             {analytics.heaviestItems.map((item, index) => (
-              <div key={item.name} className="flex items-center justify-between p-3 rounded-lg border">
+              <div
+                key={item.name}
+                className="flex items-center justify-between p-3 rounded-lg border"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium">
                     {index + 1}
@@ -345,15 +401,26 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
                     <div className="font-medium">{item.name}</div>
                     <div className="text-sm text-muted-foreground">
                       {item.category}
-                      {item.isWorn && <Badge variant="secondary" className="ml-2 text-xs">Worn</Badge>}
-                      {item.isConsumable && <Badge variant="secondary" className="ml-2 text-xs">Consumable</Badge>}
+                      {item.isWorn && (
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          Worn
+                        </Badge>
+                      )}
+                      {item.isConsumable && (
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          Consumable
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-medium">{formatWeight(item.weight)}</div>
+                  <div className="font-medium">
+                    <WeightDisplay grams={item.weight} />
+                  </div>
                   <div className="text-xs text-muted-foreground">
-                    {((item.weight / analytics.totalWeight) * 100).toFixed(1)}% of total
+                    {((item.weight / analytics.totalWeight) * 100).toFixed(1)}%
+                    of total
                   </div>
                 </div>
               </div>
@@ -378,20 +445,24 @@ export function PackListAnalytics({ items, userGoals }: PackListAnalyticsProps) 
                   Consider lighter alternatives for: {item.name}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Currently {formatWeight(item.weight)} • Could potentially save 20-40% weight
+                  Currently <WeightDisplay grams={item.weight} /> • Could
+                  potentially save 20-40% weight
                 </div>
               </div>
             ))}
-            {analytics.baseWeight > (userGoals?.baseWeightGoal || 0) && userGoals?.baseWeightGoal && (
-              <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200">
-                <div className="font-medium text-sm text-yellow-800 mb-1">
-                  Base Weight Goal Exceeded
+            {analytics.baseWeight > (userGoals?.baseWeightGoal || 0) &&
+              userGoals?.baseWeightGoal && (
+                <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200">
+                  <div className="font-medium text-sm text-yellow-800 mb-1">
+                    Base Weight Goal Exceeded
+                  </div>
+                  <div className="text-xs text-yellow-700">
+                    Consider removing non-essential items or finding lighter
+                    alternatives to reach your{' '}
+                    <WeightDisplay grams={userGoals.baseWeightGoal} /> goal.
+                  </div>
                 </div>
-                <div className="text-xs text-yellow-700">
-                  Consider removing non-essential items or finding lighter alternatives to reach your {formatWeight(userGoals.baseWeightGoal)} goal.
-                </div>
-              </div>
-            )}
+              )}
           </div>
         </CardContent>
       </Card>

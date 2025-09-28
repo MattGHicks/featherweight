@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { z } from 'zod';
 
 import { authOptions } from '@/lib/auth';
@@ -54,8 +55,10 @@ export async function PATCH(request: NextRequest) {
 
     // Build update object with only provided fields
     const updateData: any = {};
-    if (baseWeightGoal !== undefined) updateData.baseWeightGoal = baseWeightGoal;
-    if (totalWeightGoal !== undefined) updateData.totalWeightGoal = totalWeightGoal;
+    if (baseWeightGoal !== undefined)
+      updateData.baseWeightGoal = baseWeightGoal;
+    if (totalWeightGoal !== undefined)
+      updateData.totalWeightGoal = totalWeightGoal;
 
     const user = await prisma.user.update({
       where: { id: session.user.id },

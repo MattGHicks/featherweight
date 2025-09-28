@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -24,7 +24,10 @@ export async function DELETE(
     });
 
     if (!gearItem || gearItem.userId !== session.user.id) {
-      return NextResponse.json({ error: 'Gear item not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Gear item not found' },
+        { status: 404 }
+      );
     }
 
     // Delete the retailer link
@@ -71,7 +74,10 @@ export async function PATCH(
     });
 
     if (!gearItem || gearItem.userId !== session.user.id) {
-      return NextResponse.json({ error: 'Gear item not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Gear item not found' },
+        { status: 404 }
+      );
     }
 
     const body = await request.json();

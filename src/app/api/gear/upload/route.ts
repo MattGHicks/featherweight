@@ -24,7 +24,10 @@ export async function POST(request: NextRequest) {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.' },
+        {
+          error:
+            'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.',
+        },
         { status: 400 }
       );
     }
@@ -39,10 +42,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if Vercel Blob is configured
-    if (!process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_READ_WRITE_TOKEN === 'vercel_blob_rw_your_token_here') {
+    if (
+      !process.env.BLOB_READ_WRITE_TOKEN ||
+      process.env.BLOB_READ_WRITE_TOKEN === 'vercel_blob_rw_your_token_here'
+    ) {
       return NextResponse.json(
         {
-          error: 'File upload not configured. Please set up Vercel Blob or use image URLs instead.'
+          error:
+            'File upload not configured. Please set up Vercel Blob or use image URLs instead.',
         },
         { status: 400 }
       );
@@ -60,16 +67,20 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       imageUrl: blob.url,
-      message: 'Image uploaded successfully'
+      message: 'Image uploaded successfully',
     });
   } catch (error) {
     console.error('Error uploading image:', error);
 
     // Check if it's a Vercel Blob configuration error
-    if (error instanceof Error && error.message.includes('store does not exist')) {
+    if (
+      error instanceof Error &&
+      error.message.includes('store does not exist')
+    ) {
       return NextResponse.json(
         {
-          error: 'File upload not configured. Please set up Vercel Blob or use image URLs instead.'
+          error:
+            'File upload not configured. Please set up Vercel Blob or use image URLs instead.',
         },
         { status: 400 }
       );

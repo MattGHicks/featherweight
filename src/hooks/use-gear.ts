@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 
 interface Category {
@@ -98,7 +99,10 @@ export function useGear() {
     return newItem;
   };
 
-  const updateGearItem = async (id: string, data: Partial<CreateGearItem>): Promise<GearItem> => {
+  const updateGearItem = async (
+    id: string,
+    data: Partial<CreateGearItem>
+  ): Promise<GearItem> => {
     const response = await fetch(`/api/gear/${id}`, {
       method: 'PATCH',
       headers: {
@@ -113,7 +117,9 @@ export function useGear() {
     }
 
     const updatedItem = await response.json();
-    setGearItems(prev => prev.map(item => item.id === id ? updatedItem : item));
+    setGearItems(prev =>
+      prev.map(item => (item.id === id ? updatedItem : item))
+    );
     return updatedItem;
   };
 

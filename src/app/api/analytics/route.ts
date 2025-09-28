@@ -68,11 +68,14 @@ function calculateAnalytics(gearItems: any[], packLists: any[]) {
   });
 
   const baseWeights = packListStats.map(p => p.baseWeight).filter(w => w > 0);
-  const averageBaseWeight = baseWeights.length > 0
-    ? baseWeights.reduce((sum, w) => sum + w, 0) / baseWeights.length
-    : 0;
-  const lightestBaseWeight = baseWeights.length > 0 ? Math.min(...baseWeights) : 0;
-  const heaviestBaseWeight = baseWeights.length > 0 ? Math.max(...baseWeights) : 0;
+  const averageBaseWeight =
+    baseWeights.length > 0
+      ? baseWeights.reduce((sum, w) => sum + w, 0) / baseWeights.length
+      : 0;
+  const lightestBaseWeight =
+    baseWeights.length > 0 ? Math.min(...baseWeights) : 0;
+  const heaviestBaseWeight =
+    baseWeights.length > 0 ? Math.max(...baseWeights) : 0;
 
   // Category breakdown
   const categoryMap = new Map();
@@ -94,8 +97,9 @@ function calculateAnalytics(gearItems: any[], packLists: any[]) {
     cat.count += 1;
   });
 
-  const categoryBreakdown = Array.from(categoryMap.values())
-    .sort((a, b) => b.weight - a.weight);
+  const categoryBreakdown = Array.from(categoryMap.values()).sort(
+    (a, b) => b.weight - a.weight
+  );
 
   // Weight distribution (by ranges)
   const weightRanges = [
@@ -133,7 +137,7 @@ function calculateAnalytics(gearItems: any[], packLists: any[]) {
   });
 
   const topHeaviestItems = Array.from(itemUsage.values())
-    .sort((a, b) => (b.weight * b.usage) - (a.weight * a.usage))
+    .sort((a, b) => b.weight * b.usage - a.weight * a.usage)
     .slice(0, 5);
 
   return {

@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { z } from 'zod';
 
 import { authOptions } from '@/lib/auth';
@@ -44,7 +45,10 @@ export async function PATCH(request: NextRequest) {
     });
 
     if (items.length !== itemIds.length) {
-      return NextResponse.json({ error: 'Some items not found or unauthorized' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Some items not found or unauthorized' },
+        { status: 404 }
+      );
     }
 
     // If categoryId is provided, verify it exists
@@ -54,7 +58,10 @@ export async function PATCH(request: NextRequest) {
       });
 
       if (!category) {
-        return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+        return NextResponse.json(
+          { error: 'Category not found' },
+          { status: 404 }
+        );
       }
     }
 
@@ -62,10 +69,13 @@ export async function PATCH(request: NextRequest) {
     const updateData: any = {};
     if (updates.weight !== undefined) updateData.weight = updates.weight;
     if (updates.quantity !== undefined) updateData.quantity = updates.quantity;
-    if (updates.categoryId !== undefined) updateData.categoryId = updates.categoryId;
+    if (updates.categoryId !== undefined)
+      updateData.categoryId = updates.categoryId;
     if (updates.isWorn !== undefined) updateData.isWorn = updates.isWorn;
-    if (updates.isConsumable !== undefined) updateData.isConsumable = updates.isConsumable;
-    if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.isConsumable !== undefined)
+      updateData.isConsumable = updates.isConsumable;
+    if (updates.description !== undefined)
+      updateData.description = updates.description;
 
     // Add updatedAt timestamp
     updateData.updatedAt = new Date();
@@ -123,7 +133,10 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (items.length !== itemIds.length) {
-      return NextResponse.json({ error: 'Some items not found or unauthorized' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Some items not found or unauthorized' },
+        { status: 404 }
+      );
     }
 
     // Check if any items are currently in pack lists

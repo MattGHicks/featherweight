@@ -1,8 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Upload, Download, X } from 'lucide-react';
 
+import { Download, Upload, X } from 'lucide-react';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -11,9 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface CSVImportDialogProps {
   isOpen: boolean;
@@ -31,18 +32,54 @@ interface ImportItem {
   isConsumable: boolean;
 }
 
-export function CSVImportDialog({ isOpen, onClose, onImportComplete }: CSVImportDialogProps) {
+export function CSVImportDialog({
+  isOpen,
+  onClose,
+  onImportComplete,
+}: CSVImportDialogProps) {
   const [importData, setImportData] = useState<ImportItem[]>([]);
   const [isValidating, setIsValidating] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
   const downloadTemplate = () => {
-    const headers = ['Item Name', 'Category', 'Description', 'Weight (g)', 'Quantity', 'Is Worn (true/false)', 'Is Consumable (true/false)'];
+    const headers = [
+      'Item Name',
+      'Category',
+      'Description',
+      'Weight (g)',
+      'Quantity',
+      'Is Worn (true/false)',
+      'Is Consumable (true/false)',
+    ];
     const sampleRows = [
-      ['Tent', 'Shelter', 'Lightweight 2-person tent', '1200', '1', 'false', 'false'],
-      ['Hiking Boots', 'Footwear', 'Waterproof hiking boots', '800', '1', 'true', 'false'],
-      ['Energy Bar', 'Food', 'High-energy snack bar', '50', '5', 'false', 'true'],
+      [
+        'Tent',
+        'Shelter',
+        'Lightweight 2-person tent',
+        '1200',
+        '1',
+        'false',
+        'false',
+      ],
+      [
+        'Hiking Boots',
+        'Footwear',
+        'Waterproof hiking boots',
+        '800',
+        '1',
+        'true',
+        'false',
+      ],
+      [
+        'Energy Bar',
+        'Food',
+        'High-energy snack bar',
+        '50',
+        '5',
+        'false',
+        'true',
+      ],
     ];
 
     const csvContent = [headers, ...sampleRows]
@@ -109,13 +146,15 @@ export function CSVImportDialog({ isOpen, onClose, onImportComplete }: CSVImport
     setErrors([]);
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       try {
         const csvText = e.target?.result as string;
         const rows = parseCSV(csvText);
 
         if (rows.length < 2) {
-          setErrors(['CSV file must contain at least a header row and one data row']);
+          setErrors([
+            'CSV file must contain at least a header row and one data row',
+          ]);
           setIsValidating(false);
           return;
         }
@@ -180,9 +219,11 @@ export function CSVImportDialog({ isOpen, onClose, onImportComplete }: CSVImport
       // Get existing categories to match against
       const categoriesResponse = await fetch('/api/categories');
       const categories = await categoriesResponse.json();
-      const categoryMap = new Map(categories.map((cat: any) => [cat.name.toLowerCase(), cat.id]));
+      const categoryMap = new Map(
+        categories.map((cat: any) => [cat.name.toLowerCase(), cat.id])
+      );
 
-      const importPromises = importData.map(async (item) => {
+      const importPromises = importData.map(async item => {
         // Find or create category
         let categoryId = categoryMap.get(item.category.toLowerCase());
 
@@ -334,9 +375,21 @@ export function CSVImportDialog({ isOpen, onClose, onImportComplete }: CSVImport
                         <td className="p-2">{item.quantity}</td>
                         <td className="p-2">
                           <div className="flex gap-1">
-                            {item.isWorn && <Badge variant="outline" className="text-xs">Worn</Badge>}
-                            {item.isConsumable && <Badge variant="outline" className="text-xs">Consumable</Badge>}
-                            {!item.isWorn && !item.isConsumable && <Badge variant="outline" className="text-xs">Base</Badge>}
+                            {item.isWorn && (
+                              <Badge variant="outline" className="text-xs">
+                                Worn
+                              </Badge>
+                            )}
+                            {item.isConsumable && (
+                              <Badge variant="outline" className="text-xs">
+                                Consumable
+                              </Badge>
+                            )}
+                            {!item.isWorn && !item.isConsumable && (
+                              <Badge variant="outline" className="text-xs">
+                                Base
+                              </Badge>
+                            )}
                           </div>
                         </td>
                       </tr>

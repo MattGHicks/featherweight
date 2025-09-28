@@ -1,8 +1,22 @@
 'use client';
 
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 interface WeightDistributionChartProps {
   data: Array<{
@@ -11,7 +25,9 @@ interface WeightDistributionChartProps {
   }>;
 }
 
-export function WeightDistributionChart({ data }: WeightDistributionChartProps) {
+export function WeightDistributionChart({
+  data,
+}: WeightDistributionChartProps) {
   return (
     <Card>
       <CardHeader>

@@ -2,10 +2,17 @@
 
 import { useState } from 'react';
 
-import { Check, Edit3, MoreHorizontal, Trash2, Tags } from 'lucide-react';
+import { Check, Edit3, MoreHorizontal, Tags, Trash2 } from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
@@ -24,7 +31,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 
 interface GearItem {
   id: string;
@@ -78,7 +84,9 @@ export function BulkOperations({
     description: '',
   });
 
-  const selectedItemsData = items.filter(item => selectedItems.includes(item.id));
+  const selectedItemsData = items.filter(item =>
+    selectedItems.includes(item.id)
+  );
   const selectedCount = selectedItems.length;
 
   const handleSelectAll = () => {
@@ -149,7 +157,11 @@ export function BulkOperations({
   const handleBulkDelete = async () => {
     if (selectedItems.length === 0) return;
 
-    if (!confirm(`Are you sure you want to delete ${selectedCount} items? This action cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedCount} items? This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
@@ -239,7 +251,7 @@ export function BulkOperations({
         {/* Selected Items Preview */}
         <div className="mb-4">
           <div className="flex flex-wrap gap-2">
-            {selectedItemsData.slice(0, 5).map((item) => (
+            {selectedItemsData.slice(0, 5).map(item => (
               <Badge key={item.id} variant="secondary" className="text-xs">
                 {item.name}
               </Badge>
@@ -273,7 +285,7 @@ export function BulkOperations({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {categories.map((category) => (
+                {categories.map(category => (
                   <DropdownMenuItem
                     key={category.id}
                     onClick={() => handleBulkCategorize(category.id)}
@@ -319,7 +331,9 @@ export function BulkOperations({
                   type="number"
                   placeholder="Leave empty to keep current"
                   value={bulkEditData.weight}
-                  onChange={(e) => setBulkEditData({ ...bulkEditData, weight: e.target.value })}
+                  onChange={e =>
+                    setBulkEditData({ ...bulkEditData, weight: e.target.value })
+                  }
                 />
               </div>
 
@@ -330,7 +344,12 @@ export function BulkOperations({
                   type="number"
                   placeholder="Leave empty to keep current"
                   value={bulkEditData.quantity}
-                  onChange={(e) => setBulkEditData({ ...bulkEditData, quantity: e.target.value })}
+                  onChange={e =>
+                    setBulkEditData({
+                      ...bulkEditData,
+                      quantity: e.target.value,
+                    })
+                  }
                 />
               </div>
 
@@ -338,13 +357,15 @@ export function BulkOperations({
                 <Label htmlFor="bulk-category">Category</Label>
                 <Select
                   value={bulkEditData.categoryId}
-                  onValueChange={(value) => setBulkEditData({ ...bulkEditData, categoryId: value })}
+                  onValueChange={value =>
+                    setBulkEditData({ ...bulkEditData, categoryId: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select category to change" />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((category) => (
+                    {categories.map(category => (
                       <SelectItem key={category.id} value={category.id}>
                         <div className="flex items-center">
                           <div
@@ -366,7 +387,12 @@ export function BulkOperations({
                 id="bulk-description"
                 placeholder="Leave empty to keep current descriptions"
                 value={bulkEditData.description}
-                onChange={(e) => setBulkEditData({ ...bulkEditData, description: e.target.value })}
+                onChange={e =>
+                  setBulkEditData({
+                    ...bulkEditData,
+                    description: e.target.value,
+                  })
+                }
                 rows={3}
               />
             </div>
@@ -376,7 +402,12 @@ export function BulkOperations({
                 <Checkbox
                   id="bulk-worn"
                   checked={bulkEditData.isWorn}
-                  onCheckedChange={(checked) => setBulkEditData({ ...bulkEditData, isWorn: checked as boolean })}
+                  onCheckedChange={checked =>
+                    setBulkEditData({
+                      ...bulkEditData,
+                      isWorn: checked as boolean,
+                    })
+                  }
                 />
                 <Label htmlFor="bulk-worn">Mark as worn</Label>
               </div>
@@ -385,7 +416,12 @@ export function BulkOperations({
                 <Checkbox
                   id="bulk-consumable"
                   checked={bulkEditData.isConsumable}
-                  onCheckedChange={(checked) => setBulkEditData({ ...bulkEditData, isConsumable: checked as boolean })}
+                  onCheckedChange={checked =>
+                    setBulkEditData({
+                      ...bulkEditData,
+                      isConsumable: checked as boolean,
+                    })
+                  }
                 />
                 <Label htmlFor="bulk-consumable">Mark as consumable</Label>
               </div>

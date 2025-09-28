@@ -1,7 +1,9 @@
 'use client';
 
 import { forwardRef, useState } from 'react';
+
 import { Plus, X } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 
 interface FABAction {
@@ -18,8 +20,14 @@ interface FloatingActionButtonProps {
   size?: 'default' | 'lg';
 }
 
-const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonProps>(
-  ({ actions = [], mainAction, className, size = 'default', ...props }, ref) => {
+const FloatingActionButton = forwardRef<
+  HTMLButtonElement,
+  FloatingActionButtonProps
+>(
+  (
+    { actions = [], mainAction, className, size = 'default', ...props },
+    ref
+  ) => {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handleMainClick = () => {
@@ -67,8 +75,8 @@ const FloatingActionButton = forwardRef<HTMLButtonElement, FloatingActionButtonP
                     action.variant === 'destructive'
                       ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
                       : action.variant === 'secondary'
-                      ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90'
-                      : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                        ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90'
+                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
                   )}
                 >
                   {action.icon}

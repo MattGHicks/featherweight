@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+
 import {
   ArrowUpDown,
   ChevronDown,
@@ -9,7 +9,7 @@ import {
   Edit2,
   ExternalLink,
   MoreHorizontal,
-  Trash2
+  Trash2,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { formatWeight } from '@/lib/utils';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 interface Category {
   id: string;
@@ -53,7 +53,14 @@ interface GearItem {
   updatedAt: string;
 }
 
-type SortField = 'name' | 'category' | 'weight' | 'quantity' | 'totalWeight' | 'createdAt' | 'updatedAt';
+type SortField =
+  | 'name'
+  | 'category'
+  | 'weight'
+  | 'quantity'
+  | 'totalWeight'
+  | 'createdAt'
+  | 'updatedAt';
 type SortDirection = 'asc' | 'desc';
 
 interface GearTableProps {
@@ -69,7 +76,7 @@ export function GearTable({
   onEdit,
   onDelete,
   selectedItems = [],
-  onItemSelectionChange
+  onItemSelectionChange,
 }: GearTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -87,14 +94,16 @@ export function GearTable({
     if (sortField !== field) {
       return <ArrowUpDown className="ml-2 h-4 w-4" />;
     }
-    return sortDirection === 'asc' ?
-      <ChevronUp className="ml-2 h-4 w-4" /> :
-      <ChevronDown className="ml-2 h-4 w-4" />;
+    return sortDirection === 'asc' ? (
+      <ChevronUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ChevronDown className="ml-2 h-4 w-4" />
+    );
   };
 
   const sortedItems = [...gearItems].sort((a, b) => {
-    let aValue: any;
-    let bValue: any;
+    let aValue: string | number;
+    let bValue: string | number;
 
     switch (sortField) {
       case 'name':
@@ -143,7 +152,7 @@ export function GearTable({
     <div className="w-full">
       {/* Mobile view - stacked cards */}
       <div className="block md:hidden space-y-4">
-        {sortedItems.map((item) => (
+        {sortedItems.map(item => (
           <Card key={item.id} className="p-4">
             <div className="space-y-3">
               <div className="flex items-start justify-between">
@@ -198,7 +207,7 @@ export function GearTable({
                   variant="secondary"
                   style={{
                     backgroundColor: item.category.color,
-                    color: 'white'
+                    color: 'white',
                   }}
                 >
                   {item.category.name}
@@ -218,7 +227,7 @@ export function GearTable({
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-muted-foreground">Unit Weight:</span>
-                  <span className="ml-2 font-mono">{formatWeight(item.weight)}</span>
+                  <WeightDisplay grams={item.weight} className="ml-2" />
                 </div>
                 <div>
                   <span className="text-muted-foreground">Quantity:</span>
@@ -226,7 +235,10 @@ export function GearTable({
                 </div>
                 <div>
                   <span className="text-muted-foreground">Total Weight:</span>
-                  <span className="ml-2 font-mono font-medium">{formatWeight(item.weight * item.quantity)}</span>
+                  <WeightDisplay
+                    grams={item.weight * item.quantity}
+                    className="ml-2 font-medium"
+                  />
                 </div>
                 <div>
                   <span className="text-muted-foreground">Added:</span>
@@ -248,9 +260,12 @@ export function GearTable({
                   {onItemSelectionChange && (
                     <TableHead className="w-[50px]">
                       <Checkbox
-                        checked={selectedItems.length === gearItems.length && gearItems.length > 0}
-                        onCheckedChange={(checked) => {
-                          gearItems.forEach((item) => {
+                        checked={
+                          selectedItems.length === gearItems.length &&
+                          gearItems.length > 0
+                        }
+                        onCheckedChange={checked => {
+                          gearItems.forEach(item => {
                             onItemSelectionChange(item.id, checked as boolean);
                           });
                         }}
@@ -325,19 +340,25 @@ export function GearTable({
               <TableBody>
                 {sortedItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={onItemSelectionChange ? 9 : 8} className="text-center text-muted-foreground py-8">
+                    <TableCell
+                      colSpan={onItemSelectionChange ? 9 : 8}
+                      className="text-center text-muted-foreground py-8"
+                    >
                       No gear items found
                     </TableCell>
                   </TableRow>
                 ) : (
-                  sortedItems.map((item) => (
+                  sortedItems.map(item => (
                     <TableRow key={item.id} className="hover:bg-muted/50">
                       {onItemSelectionChange && (
                         <TableCell className="p-4">
                           <Checkbox
                             checked={selectedItems.includes(item.id)}
-                            onCheckedChange={(checked) => {
-                              onItemSelectionChange(item.id, checked as boolean);
+                            onCheckedChange={checked => {
+                              onItemSelectionChange(
+                                item.id,
+                                checked as boolean
+                              );
                             }}
                             aria-label={`Select ${item.name}`}
                           />
@@ -358,20 +379,20 @@ export function GearTable({
                           variant="secondary"
                           style={{
                             backgroundColor: item.category.color,
-                            color: 'white'
+                            color: 'white',
                           }}
                         >
                           {item.category.name}
                         </Badge>
                       </TableCell>
                       <TableCell className="p-4 text-right font-mono tabular-nums">
-                        {formatWeight(item.weight)}
+                        <WeightDisplay grams={item.weight} />
                       </TableCell>
                       <TableCell className="p-4 text-center tabular-nums">
                         {item.quantity}
                       </TableCell>
                       <TableCell className="p-4 text-right font-mono font-medium tabular-nums">
-                        {formatWeight(item.weight * item.quantity)}
+                        <WeightDisplay grams={item.weight * item.quantity} />
                       </TableCell>
                       <TableCell className="p-4">
                         <div className="flex flex-wrap gap-1">
@@ -445,7 +466,13 @@ export function GearTable({
       {sortedItems.length > 0 && (
         <div className="mt-4 text-sm text-muted-foreground">
           Showing {sortedItems.length} item{sortedItems.length !== 1 ? 's' : ''}
-          • Total weight: {formatWeight(sortedItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0))}
+          • Total weight:{' '}
+          <WeightDisplay
+            grams={sortedItems.reduce(
+              (sum, item) => sum + item.weight * item.quantity,
+              0
+            )}
+          />
         </div>
       )}
     </div>

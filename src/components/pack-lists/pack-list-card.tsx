@@ -1,18 +1,24 @@
 'use client';
 
 import Link from 'next/link';
+
 import { Edit2, Globe, Lock, MoreHorizontal, Trash2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatWeight } from '@/lib/utils';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 interface PackListStats {
   totalWeight: number;
@@ -33,7 +39,11 @@ interface PackListCardProps {
   onDelete?: (packList: any) => void;
 }
 
-export function PackListCard({ packList, onEdit, onDelete }: PackListCardProps) {
+export function PackListCard({
+  packList,
+  onEdit,
+  onDelete,
+}: PackListCardProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -62,7 +72,10 @@ export function PackListCard({ packList, onEdit, onDelete }: PackListCardProps) 
             )}
           </div>
           <div className="flex items-center space-x-2 ml-2">
-            <Badge variant={packList.isPublic ? 'default' : 'secondary'} className="text-xs">
+            <Badge
+              variant={packList.isPublic ? 'default' : 'secondary'}
+              className="text-xs"
+            >
               {packList.isPublic ? (
                 <>
                   <Globe className="w-3 h-3 mr-1" />
@@ -110,28 +123,28 @@ export function PackListCard({ packList, onEdit, onDelete }: PackListCardProps) 
       <CardContent className="pb-3">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-lg font-bold">
-              {packList.stats.itemCount}
-            </div>
+            <div className="text-lg font-bold">{packList.stats.itemCount}</div>
             <div className="text-xs text-muted-foreground">
               Item{packList.stats.itemCount !== 1 ? 's' : ''}
             </div>
           </div>
           <div>
             <div className="text-lg font-bold">
-              {packList.stats.baseWeight > 0
-                ? formatWeight(packList.stats.baseWeight)
-                : '--'
-              }
+              {packList.stats.baseWeight > 0 ? (
+                <WeightDisplay grams={packList.stats.baseWeight} />
+              ) : (
+                '--'
+              )}
             </div>
             <div className="text-xs text-muted-foreground">Base Weight</div>
           </div>
           <div>
             <div className="text-lg font-bold">
-              {packList.stats.totalWeight > 0
-                ? formatWeight(packList.stats.totalWeight)
-                : '--'
-              }
+              {packList.stats.totalWeight > 0 ? (
+                <WeightDisplay grams={packList.stats.totalWeight} />
+              ) : (
+                '--'
+              )}
             </div>
             <div className="text-xs text-muted-foreground">Total Weight</div>
           </div>

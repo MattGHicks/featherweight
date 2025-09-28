@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
+
 import { z } from 'zod';
 
 import { authOptions } from '@/lib/auth';
@@ -19,16 +20,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { templateId, name, description } = createFromTemplateSchema.parse(body);
+    const { templateId, name, description } =
+      createFromTemplateSchema.parse(body);
 
     // Fetch the template with its items
     const template = await prisma.packListTemplate.findUnique({
       where: {
         id: templateId,
-        OR: [
-          { isPublic: true },
-          { createdBy: session.user.id },
-        ],
+        OR: [{ isPublic: true }, { createdBy: session.user.id }],
       },
       include: {
         templateItems: {
@@ -40,7 +39,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!template) {
-      return NextResponse.json({ error: 'Template not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Template not found' },
+        { status: 404 }
+      );
     }
 
     // Create the pack list

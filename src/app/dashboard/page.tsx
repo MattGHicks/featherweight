@@ -15,8 +15,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { WeightDisplay } from '@/components/ui/weight-display';
 import { useDashboardStats } from '@/hooks/use-dashboard-stats';
-import { formatWeight } from '@/lib/utils';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -97,8 +97,7 @@ export default function Dashboard() {
             <p className="text-xs text-muted-foreground">
               {stats.totalGearItems === 0
                 ? 'Start building your gear library'
-                : `${stats.totalGearItems} item${stats.totalGearItems !== 1 ? 's' : ''} in your library`
-              }
+                : `${stats.totalGearItems} item${stats.totalGearItems !== 1 ? 's' : ''} in your library`}
             </p>
           </CardContent>
         </Card>
@@ -115,8 +114,7 @@ export default function Dashboard() {
             <p className="text-xs text-muted-foreground">
               {stats.totalPackLists === 0
                 ? 'Create your first pack list'
-                : `${stats.totalPackLists} pack list${stats.totalPackLists !== 1 ? 's' : ''} created`
-              }
+                : `${stats.totalPackLists} pack list${stats.totalPackLists !== 1 ? 's' : ''} created`}
             </p>
           </CardContent>
         </Card>
@@ -130,18 +128,18 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isLoading
-                ? '...'
-                : stats.lightestBaseWeight
-                  ? formatWeight(stats.lightestBaseWeight)
-                  : '--'
-              }
+              {isLoading ? (
+                '...'
+              ) : stats.lightestBaseWeight ? (
+                <WeightDisplay grams={stats.lightestBaseWeight} />
+              ) : (
+                '--'
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
               {stats.lightestBaseWeight
                 ? 'Your personal best'
-                : 'No pack lists yet'
-              }
+                : 'No pack lists yet'}
             </p>
           </CardContent>
         </Card>
@@ -194,16 +192,21 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {stats.recentGear.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between">
+                {stats.recentGear.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-sm font-medium truncate">
+                        {item.name}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {item.category.name}
                       </p>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {formatWeight(item.weight)}
+                      <WeightDisplay grams={item.weight} />
                     </div>
                   </div>
                 ))}
@@ -240,19 +243,25 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {stats.recentPackLists.map((list) => (
-                  <div key={list.id} className="flex items-center justify-between">
+                {stats.recentPackLists.map(list => (
+                  <div
+                    key={list.id}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{list.name}</p>
+                      <p className="text-sm font-medium truncate">
+                        {list.name}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {list.stats.itemCount} items
                       </p>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {list.stats.baseWeight > 0
-                        ? formatWeight(list.stats.baseWeight)
-                        : '--'
-                      }
+                      {list.stats.baseWeight > 0 ? (
+                        <WeightDisplay grams={list.stats.baseWeight} />
+                      ) : (
+                        '--'
+                      )}
                     </div>
                   </div>
                 ))}

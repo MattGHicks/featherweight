@@ -1,16 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+
 import { useRouter } from 'next/navigation';
+
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { usePackLists } from '@/hooks/use-pack-lists';
 
 const packListFormSchema = z.object({
@@ -103,7 +105,7 @@ export function PackListForm({ initialData, onSuccess }: PackListFormProps) {
         <Checkbox
           id="isPublic"
           checked={watchedValues.isPublic}
-          onCheckedChange={(checked) => setValue('isPublic', !!checked)}
+          onCheckedChange={checked => setValue('isPublic', !!checked)}
         />
         <Label htmlFor="isPublic">
           Make this pack list public (others can view and copy it)
@@ -118,10 +120,13 @@ export function PackListForm({ initialData, onSuccess }: PackListFormProps) {
               : 'Creating...'
             : isEditing
               ? 'Update Pack List'
-              : 'Create Pack List'
-          }
+              : 'Create Pack List'}
         </Button>
-        <Button type="button" variant="outline" onClick={() => router.push('/lists')}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push('/lists')}
+        >
           Cancel
         </Button>
       </div>

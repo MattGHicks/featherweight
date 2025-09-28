@@ -1,5 +1,6 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -8,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { formatWeight } from '@/lib/utils';
 
 interface GearItem {
@@ -77,7 +77,7 @@ export function PublicPackListTable({ items }: PublicPackListTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((item) => {
+          {items.map(item => {
             const totalWeight = item.gearItem.weight * item.quantity;
 
             return (

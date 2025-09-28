@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function checkData() {
   try {
     const user = await prisma.user.findUnique({
-      where: { email: 'mattghicks@gmail.com' }
+      where: { email: 'mattghicks@gmail.com' },
     });
 
     if (!user) {
@@ -19,7 +19,7 @@ async function checkData() {
 
     // Check gear items
     const gearCount = await prisma.gearItem.count({
-      where: { userId: user.id }
+      where: { userId: user.id },
     });
     console.log(`\nGear Items: ${gearCount}`);
 
@@ -31,12 +31,12 @@ async function checkData() {
           include: {
             gearItem: {
               include: {
-                category: true
-              }
-            }
-          }
-        }
-      }
+                category: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     console.log(`\nPack Lists: ${packLists.length}`);
@@ -44,20 +44,26 @@ async function checkData() {
     packLists.forEach(list => {
       const totalWeight = list.items
         .filter(item => item.isIncluded)
-        .reduce((sum, item) => sum + (item.gearItem.weight * item.quantity), 0);
+        .reduce((sum, item) => sum + item.gearItem.weight * item.quantity, 0);
 
       const baseWeight = list.items
-        .filter(item => item.isIncluded && !item.gearItem.isWorn && !item.gearItem.isConsumable)
-        .reduce((sum, item) => sum + (item.gearItem.weight * item.quantity), 0);
+        .filter(
+          item =>
+            item.isIncluded &&
+            !item.gearItem.isWorn &&
+            !item.gearItem.isConsumable
+        )
+        .reduce((sum, item) => sum + item.gearItem.weight * item.quantity, 0);
 
-      console.log(`- ${list.name}: ${list.items.length} items, ${totalWeight}g total, ${baseWeight}g base`);
+      console.log(
+        `- ${list.name}: ${list.items.length} items, ${totalWeight}g total, ${baseWeight}g base`
+      );
     });
 
     // Check categories
     const categories = await prisma.category.findMany();
     console.log(`\nCategories: ${categories.length}`);
     categories.forEach(cat => console.log(`- ${cat.name}`));
-
   } catch (error) {
     console.error('Error checking data:', error);
   } finally {

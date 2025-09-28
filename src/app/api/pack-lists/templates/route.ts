@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -14,10 +14,7 @@ export async function GET() {
     // Fetch public templates and user's own templates
     const templates = await prisma.packListTemplate.findMany({
       where: {
-        OR: [
-          { isPublic: true },
-          { createdBy: session.user.id },
-        ],
+        OR: [{ isPublic: true }, { createdBy: session.user.id }],
       },
       include: {
         templateItems: {

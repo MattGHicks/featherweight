@@ -1,7 +1,8 @@
 'use client';
 
-import { Search, Filter, X } from 'lucide-react';
+import { Filter, Search, X } from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 
 interface Category {
   id: string;
@@ -52,7 +52,7 @@ export function GearFilters({
             placeholder="Search gear by name or description..."
             className="pl-8"
             value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={e => onSearchChange(e.target.value)}
           />
         </div>
 
@@ -61,14 +61,16 @@ export function GearFilters({
           {/* Category Filter */}
           <Select
             value={selectedCategory || 'all'}
-            onValueChange={(value) => onCategoryChange(value === 'all' ? null : value)}
+            onValueChange={value =>
+              onCategoryChange(value === 'all' ? null : value)
+            }
           >
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
+              {categories.map(category => (
                 <SelectItem key={category.id} value={category.id}>
                   <div className="flex items-center gap-2">
                     <div
@@ -85,7 +87,9 @@ export function GearFilters({
           {/* Type Filter */}
           <Select
             value={selectedType || 'all'}
-            onValueChange={(value) => onTypeChange(value === 'all' ? null : value)}
+            onValueChange={value =>
+              onTypeChange(value === 'all' ? null : value)
+            }
           >
             <SelectTrigger className="w-full sm:w-[140px]">
               <SelectValue placeholder="All Types" />
@@ -136,7 +140,12 @@ export function GearFilters({
           )}
           {selectedType && (
             <Badge variant="secondary" className="gap-1">
-              Type: {selectedType === 'base' ? 'Base Weight' : selectedType === 'worn' ? 'Worn Weight' : 'Consumable'}
+              Type:{' '}
+              {selectedType === 'base'
+                ? 'Base Weight'
+                : selectedType === 'worn'
+                  ? 'Worn Weight'
+                  : 'Consumable'}
               <X
                 className="h-3 w-3 cursor-pointer"
                 onClick={() => onTypeChange(null)}

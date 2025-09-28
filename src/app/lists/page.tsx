@@ -1,17 +1,18 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
 import { useState } from 'react';
+
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { List, Plus, Search } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/page-header';
+import { PackListCard } from '@/components/pack-lists/pack-list-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { PackListCard } from '@/components/pack-lists/pack-list-card';
 import { usePackLists } from '@/hooks/use-pack-lists';
 
 export default function PackListsPage() {
@@ -49,9 +50,10 @@ export default function PackListsPage() {
   }
 
   // Filter pack lists based on search term
-  const filteredPackLists = packLists.filter(list =>
-    list.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    list.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPackLists = packLists.filter(
+    list =>
+      list.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      list.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDelete = async (packList: any) => {
@@ -89,7 +91,7 @@ export default function PackListsPage() {
             placeholder="Search pack lists..."
             className="pl-8"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -107,9 +109,8 @@ export default function PackListsPage() {
             </h3>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm">
               {searchTerm
-                ? 'Try adjusting your search terms to find what you\'re looking for.'
-                : 'Create your first pack list to start planning trips and optimizing your gear selection.'
-              }
+                ? "Try adjusting your search terms to find what you're looking for."
+                : 'Create your first pack list to start planning trips and optimizing your gear selection.'}
             </p>
             <Button asChild>
               <Link href="/lists/new">
@@ -122,7 +123,8 @@ export default function PackListsPage() {
       ) : (
         <>
           <div className="mb-4 text-sm text-muted-foreground">
-            {filteredPackLists.length} pack list{filteredPackLists.length !== 1 ? 's' : ''}
+            {filteredPackLists.length} pack list
+            {filteredPackLists.length !== 1 ? 's' : ''}
             {searchTerm && ` matching "${searchTerm}"`}
           </div>
           <div
@@ -131,11 +133,11 @@ export default function PackListsPage() {
               gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
             }}
           >
-            {filteredPackLists.map((packList) => (
+            {filteredPackLists.map(packList => (
               <PackListCard
                 key={packList.id}
                 packList={packList}
-                onEdit={(packList) => {
+                onEdit={packList => {
                   // TODO: Implement edit functionality
                   console.log('Edit pack list:', packList);
                 }}

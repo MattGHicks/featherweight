@@ -1,43 +1,41 @@
+'use client';
+
+import { useUserPreferences } from '@/hooks/use-user-preferences';
 import { cn } from '@/lib/utils';
+import {
+  WeightDisplayOptions,
+  WeightUnit,
+  formatWeight,
+} from '@/lib/weight-utils';
 
 interface WeightDisplayProps {
   grams: number;
-  units?: 'metric' | 'imperial';
   className?: string;
+  decimals?: number;
   showUnit?: boolean;
-  precision?: number;
+  fallbackUnit?: WeightUnit;
 }
 
 export function WeightDisplay({
   grams,
-  units = 'imperial',
   className,
+  decimals,
   showUnit = true,
-  precision = 1,
+  fallbackUnit = 'lbs',
 }: WeightDisplayProps) {
-  const formatWeight = (grams: number) => {
-    if (units === 'metric') {
-      if (grams >= 1000) {
-        const kg = (grams / 1000).toFixed(precision);
-        return showUnit ? `${kg} kg` : kg;
-      }
-      const g = grams.toFixed(0);
-      return showUnit ? `${g} g` : g;
-    } else {
-      const ounces = grams * 0.035274;
-      if (ounces >= 16) {
-        const pounds = Math.floor(ounces / 16);
-        const remainingOunces = (ounces % 16).toFixed(precision);
-        return showUnit
-          ? `${pounds} lb ${remainingOunces} oz`
-          : `${pounds}.${remainingOunces}`;
-      }
-      const oz = ounces.toFixed(precision);
-      return showUnit ? `${oz} oz` : oz;
-    }
+  const { preferences } = useUserPreferences();
+
+  const unit = preferences?.preferredUnits || fallbackUnit;
+
+  const displayOptions: WeightDisplayOptions = {
+    unit,
+    decimals,
+    showUnit,
   };
 
   return (
-    <span className={cn('font-mono', className)}>{formatWeight(grams)}</span>
+    <span className={cn('font-mono', className)}>
+      {formatWeight(grams, displayOptions)}
+    </span>
   );
 }

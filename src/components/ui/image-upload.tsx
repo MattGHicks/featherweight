@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from 'react';
 
+import Image from 'next/image';
+
 import { Upload, X } from 'lucide-react';
 
 import { Button } from './button';
@@ -43,7 +45,9 @@ export function ImageUpload({
         onChange(imageUrl);
       } catch (error) {
         console.error('Upload error:', error);
-        alert(error instanceof Error ? error.message : 'Failed to upload image');
+        alert(
+          error instanceof Error ? error.message : 'Failed to upload image'
+        );
       } finally {
         setIsLoading(false);
       }
@@ -72,18 +76,22 @@ export function ImageUpload({
     [handleUpload]
   );
 
-  const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  }, []);
+  const handleDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+    },
+    []
+  );
 
   if (value) {
     return (
       <div className="relative">
         <div className="relative aspect-square w-32 overflow-hidden rounded-lg border">
-          <img
+          <Image
             src={value}
             alt="Uploaded image"
-            className="h-full w-full object-cover"
+            fill
+            className="object-cover"
           />
           <Button
             type="button"
@@ -122,7 +130,9 @@ export function ImageUpload({
         ) : (
           <>
             <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
-            <p className="text-sm font-medium">Click to upload or drag and drop</p>
+            <p className="text-sm font-medium">
+              Click to upload or drag and drop
+            </p>
             <p className="text-xs text-muted-foreground">
               PNG, JPG, GIF up to 5MB
             </p>

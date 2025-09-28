@@ -1,16 +1,23 @@
 'use client';
 
-import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 
-import { Share, Copy, ArrowLeft, Globe } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+
+import { ArrowLeft, Copy, Globe, Share } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { PublicPackListTable } from '@/components/pack-lists/public-pack-list-table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { formatWeight } from '@/lib/utils';
 
 interface PackListStats {
@@ -81,7 +88,9 @@ export default function PublicPackListPage() {
         setPackList(data);
       } catch (err) {
         console.error('Error fetching public pack list:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load pack list');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load pack list'
+        );
       } finally {
         setIsLoading(false);
       }
@@ -217,7 +226,9 @@ export default function PublicPackListPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {packList.stats.baseWeight > 0 ? formatWeight(packList.stats.baseWeight) : '--'}
+              {packList.stats.baseWeight > 0
+                ? formatWeight(packList.stats.baseWeight)
+                : '--'}
             </div>
             <CardDescription>Excluding worn & consumable</CardDescription>
           </CardContent>
@@ -229,7 +240,9 @@ export default function PublicPackListPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {packList.stats.totalWeight > 0 ? formatWeight(packList.stats.totalWeight) : '--'}
+              {packList.stats.totalWeight > 0
+                ? formatWeight(packList.stats.totalWeight)
+                : '--'}
             </div>
             <CardDescription>All included items</CardDescription>
           </CardContent>

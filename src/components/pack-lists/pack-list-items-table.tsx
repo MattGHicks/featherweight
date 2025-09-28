@@ -1,15 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { MoreHorizontal, Pencil, Trash2, Eye, EyeOff } from 'lucide-react';
 
+import { Eye, EyeOff, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -18,10 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { formatWeight } from '@/lib/utils';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 interface GearItem {
   id: string;
@@ -64,17 +65,23 @@ export function PackListItemsTable({
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editQuantity, setEditQuantity] = useState<number>(1);
 
-  const handleIncludedChange = async (item: PackListItem, included: boolean) => {
+  const handleIncludedChange = async (
+    item: PackListItem,
+    included: boolean
+  ) => {
     try {
-      const response = await fetch(`/api/pack-lists/${packListId}/items/${item.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          isIncluded: included,
-        }),
-      });
+      const response = await fetch(
+        `/api/pack-lists/${packListId}/items/${item.id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            isIncluded: included,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to update item');
@@ -95,15 +102,18 @@ export function PackListItemsTable({
 
   const handleQuantitySave = async (item: PackListItem) => {
     try {
-      const response = await fetch(`/api/pack-lists/${packListId}/items/${item.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          quantity: editQuantity,
-        }),
-      });
+      const response = await fetch(
+        `/api/pack-lists/${packListId}/items/${item.id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            quantity: editQuantity,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to update quantity');
@@ -124,14 +134,19 @@ export function PackListItemsTable({
   };
 
   const handleDelete = async (item: PackListItem) => {
-    if (!confirm(`Remove &quot;${item.gearItem.name}&quot; from this pack list?`)) {
+    if (
+      !confirm(`Remove &quot;${item.gearItem.name}&quot; from this pack list?`)
+    ) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/pack-lists/${packListId}/items/${item.id}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `/api/pack-lists/${packListId}/items/${item.id}`,
+        {
+          method: 'DELETE',
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to remove item');
@@ -147,7 +162,9 @@ export function PackListItemsTable({
   if (items.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">No items in this pack list yet</p>
+        <p className="text-muted-foreground mb-4">
+          No items in this pack list yet
+        </p>
         <p className="text-sm text-muted-foreground">
           Use the "Add Gear" button to add items from your gear library
         </p>
@@ -170,16 +187,19 @@ export function PackListItemsTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map((item) => {
+        {items.map(item => {
           const totalWeight = item.gearItem.weight * item.quantity;
           const isEditing = editingItem === item.id;
 
           return (
-            <TableRow key={item.id} className={!item.isIncluded ? 'opacity-50' : ''}>
+            <TableRow
+              key={item.id}
+              className={!item.isIncluded ? 'opacity-50' : ''}
+            >
               <TableCell>
                 <Checkbox
                   checked={item.isIncluded}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={checked =>
                     handleIncludedChange(item, checked as boolean)
                   }
                 />
@@ -208,7 +228,7 @@ export function PackListItemsTable({
               </TableCell>
               <TableCell>
                 <span className="font-mono">
-                  {formatWeight(item.gearItem.weight)}
+                  <WeightDisplay grams={item.gearItem.weight} />
                 </span>
               </TableCell>
               <TableCell>
@@ -217,7 +237,9 @@ export function PackListItemsTable({
                     <Input
                       type="number"
                       value={editQuantity}
-                      onChange={(e) => setEditQuantity(parseInt(e.target.value) || 1)}
+                      onChange={e =>
+                        setEditQuantity(parseInt(e.target.value) || 1)
+                      }
                       className="w-16"
                       min="1"
                     />
@@ -250,7 +272,7 @@ export function PackListItemsTable({
               </TableCell>
               <TableCell>
                 <span className="font-mono font-semibold">
-                  {formatWeight(totalWeight)}
+                  <WeightDisplay grams={totalWeight} />
                 </span>
               </TableCell>
               <TableCell>

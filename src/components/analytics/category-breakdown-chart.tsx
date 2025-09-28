@@ -1,8 +1,21 @@
 'use client';
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
+import {
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+} from 'recharts';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { formatWeight } from '@/lib/utils';
 
 interface CategoryBreakdownChartProps {
@@ -15,12 +28,15 @@ interface CategoryBreakdownChartProps {
   detailed?: boolean;
 }
 
-export function CategoryBreakdownChart({ data, detailed = false }: CategoryBreakdownChartProps) {
+export function CategoryBreakdownChart({
+  data,
+  detailed = false,
+}: CategoryBreakdownChartProps) {
   const totalWeight = data.reduce((sum, item) => sum + item.weight, 0);
 
   const chartData = data.map(item => ({
     ...item,
-    percentage: totalWeight > 0 ? (item.weight / totalWeight * 100) : 0,
+    percentage: totalWeight > 0 ? (item.weight / totalWeight) * 100 : 0,
   }));
 
   const CustomTooltip = ({ active, payload }: any) => {
@@ -32,9 +48,7 @@ export function CategoryBreakdownChart({ data, detailed = false }: CategoryBreak
           <p className="text-sm text-muted-foreground">
             Weight: {formatWeight(data.weight)} ({data.percentage.toFixed(1)}%)
           </p>
-          <p className="text-sm text-muted-foreground">
-            Items: {data.count}
-          </p>
+          <p className="text-sm text-muted-foreground">Items: {data.count}</p>
         </div>
       );
     }
@@ -48,8 +62,7 @@ export function CategoryBreakdownChart({ data, detailed = false }: CategoryBreak
         <CardDescription>
           {detailed
             ? 'Detailed breakdown showing weight distribution across gear categories'
-            : 'How your gear weight is distributed across different categories'
-          }
+            : 'How your gear weight is distributed across different categories'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -68,7 +81,9 @@ export function CategoryBreakdownChart({ data, detailed = false }: CategoryBreak
                   outerRadius={80}
                   dataKey="weight"
                   label={(entry: any) =>
-                    entry.percentage > 5 ? `${entry.category} (${entry.percentage.toFixed(1)}%)` : ''
+                    entry.percentage > 5
+                      ? `${entry.category} (${entry.percentage.toFixed(1)}%)`
+                      : ''
                   }
                 >
                   {chartData.map((entry, index) => (
@@ -84,8 +99,11 @@ export function CategoryBreakdownChart({ data, detailed = false }: CategoryBreak
                 <h4 className="font-medium">Category Details</h4>
                 {chartData
                   .sort((a, b) => b.weight - a.weight)
-                  .map((item) => (
-                    <div key={item.category} className="flex items-center justify-between">
+                  .map(item => (
+                    <div
+                      key={item.category}
+                      className="flex items-center justify-between"
+                    >
                       <div className="flex items-center space-x-3">
                         <div
                           className="w-4 h-4 rounded"

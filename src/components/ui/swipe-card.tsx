@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
 import { cn } from '@/lib/utils';
 
 interface SwipeCardProps {
@@ -51,7 +52,10 @@ export function SwipeCard({
 
     // Limit the swipe distance to prevent over-swiping
     const maxSwipe = cardRef.current?.offsetWidth || 300;
-    const limitedDiff = Math.max(-maxSwipe * 0.3, Math.min(maxSwipe * 0.3, diff));
+    const limitedDiff = Math.max(
+      -maxSwipe * 0.3,
+      Math.min(maxSwipe * 0.3, diff)
+    );
     setTranslateX(limitedDiff);
   };
 
@@ -88,7 +92,10 @@ export function SwipeCard({
     const diff = x - startX;
 
     const maxSwipe = cardRef.current?.offsetWidth || 300;
-    const limitedDiff = Math.max(-maxSwipe * 0.3, Math.min(maxSwipe * 0.3, diff));
+    const limitedDiff = Math.max(
+      -maxSwipe * 0.3,
+      Math.min(maxSwipe * 0.3, diff)
+    );
     setTranslateX(limitedDiff);
   };
 
@@ -120,7 +127,10 @@ export function SwipeCard({
       const diff = x - startX;
 
       const maxSwipe = cardRef.current?.offsetWidth || 300;
-      const limitedDiff = Math.max(-maxSwipe * 0.3, Math.min(maxSwipe * 0.3, diff));
+      const limitedDiff = Math.max(
+        -maxSwipe * 0.3,
+        Math.min(maxSwipe * 0.3, diff)
+      );
       setTranslateX(limitedDiff);
     };
 
@@ -161,11 +171,13 @@ export function SwipeCard({
     <div className="relative overflow-hidden">
       {/* Left action background */}
       {leftAction && (
-        <div className={cn(
-          'absolute inset-y-0 left-0 flex items-center justify-start pl-4 transition-opacity',
-          leftAction.color,
-          leftVisible ? 'opacity-100' : 'opacity-0'
-        )}>
+        <div
+          className={cn(
+            'absolute inset-y-0 left-0 flex items-center justify-start pl-4 transition-opacity',
+            leftAction.color,
+            leftVisible ? 'opacity-100' : 'opacity-0'
+          )}
+        >
           <div className="flex items-center gap-2 text-white">
             {leftAction.icon}
             <span className="text-sm font-medium">{leftAction.label}</span>
@@ -175,11 +187,13 @@ export function SwipeCard({
 
       {/* Right action background */}
       {rightAction && (
-        <div className={cn(
-          'absolute inset-y-0 right-0 flex items-center justify-end pr-4 transition-opacity',
-          rightAction.color,
-          rightVisible ? 'opacity-100' : 'opacity-0'
-        )}>
+        <div
+          className={cn(
+            'absolute inset-y-0 right-0 flex items-center justify-end pr-4 transition-opacity',
+            rightAction.color,
+            rightVisible ? 'opacity-100' : 'opacity-0'
+          )}
+        >
           <div className="flex items-center gap-2 text-white">
             <span className="text-sm font-medium">{rightAction.label}</span>
             {rightAction.icon}

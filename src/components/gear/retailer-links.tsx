@@ -1,13 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { ExternalLink, Plus, X, ShoppingCart, DollarSign } from 'lucide-react';
 
+import { DollarSign, ExternalLink, Plus, ShoppingCart, X } from 'lucide-react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 
 interface RetailerLink {
   id: string;
@@ -31,10 +38,14 @@ const popularRetailers = [
   { name: 'Zpacks', domain: 'zpacks.com' },
   { name: 'Hyperlite Mountain Gear', domain: 'hyperlitemountaingear.com' },
   { name: 'Outdoor Research', domain: 'outdoorresearch.com' },
-  { name: 'Arc\'teryx', domain: 'arcteryx.com' },
+  { name: "Arc'teryx", domain: 'arcteryx.com' },
 ];
 
-export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }: RetailerLinksProps) {
+export function RetailerLinks({
+  gearItemId,
+  initialLinks = [],
+  onLinksUpdated,
+}: RetailerLinksProps) {
   const [links, setLinks] = useState<RetailerLink[]>(initialLinks);
   const [isAdding, setIsAdding] = useState(false);
   const [newLink, setNewLink] = useState({ name: '', url: '', price: '' });
@@ -43,7 +54,9 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
   const detectRetailer = (url: string): string => {
     try {
       const domain = new URL(url).hostname.toLowerCase();
-      const retailer = popularRetailers.find(r => domain.includes(r.domain.split('.')[0]));
+      const retailer = popularRetailers.find(r =>
+        domain.includes(r.domain.split('.')[0])
+      );
       return retailer?.name || 'Unknown Retailer';
     } catch {
       return 'Unknown Retailer';
@@ -89,9 +102,12 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
   const handleRemoveLink = async (linkId: string) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/gear/${gearItemId}/retailers/${linkId}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `/api/gear/${gearItemId}/retailers/${linkId}`,
+        {
+          method: 'DELETE',
+        }
+      );
 
       if (response.ok) {
         const updatedLinks = await response.json();
@@ -110,7 +126,9 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
 
   const handlePriceUpdate = async (linkId: string) => {
     // This would typically scrape the price or integrate with price tracking APIs
-    alert('Price tracking feature coming soon! For now, you can manually update prices.');
+    alert(
+      'Price tracking feature coming soon! For now, you can manually update prices.'
+    );
   };
 
   return (
@@ -127,7 +145,11 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
             </CardDescription>
           </div>
           {!isAdding && (
-            <Button variant="outline" size="sm" onClick={() => setIsAdding(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsAdding(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Link
             </Button>
@@ -144,7 +166,7 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
                 type="url"
                 placeholder="https://example.com/product-page"
                 value={newLink.url}
-                onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
+                onChange={e => setNewLink({ ...newLink, url: e.target.value })}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -154,7 +176,9 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
                   id="retailer-name"
                   placeholder="Auto-detected from URL"
                   value={newLink.name}
-                  onChange={(e) => setNewLink({ ...newLink, name: e.target.value })}
+                  onChange={e =>
+                    setNewLink({ ...newLink, name: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -165,15 +189,24 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
                   step="0.01"
                   placeholder="Optional"
                   value={newLink.price}
-                  onChange={(e) => setNewLink({ ...newLink, price: e.target.value })}
+                  onChange={e =>
+                    setNewLink({ ...newLink, price: e.target.value })
+                  }
                 />
               </div>
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleAddLink} disabled={isLoading || !newLink.url.trim()}>
+              <Button
+                onClick={handleAddLink}
+                disabled={isLoading || !newLink.url.trim()}
+              >
                 {isLoading ? 'Adding...' : 'Add Link'}
               </Button>
-              <Button variant="outline" onClick={() => setIsAdding(false)} disabled={isLoading}>
+              <Button
+                variant="outline"
+                onClick={() => setIsAdding(false)}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
             </div>
@@ -185,7 +218,8 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
             <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="font-medium mb-2">No retailer links yet</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Add links to track where you can buy this item and monitor price changes
+              Add links to track where you can buy this item and monitor price
+              changes
             </p>
             <Button onClick={() => setIsAdding(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -194,7 +228,7 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
           </div>
         ) : (
           <div className="space-y-3">
-            {links.map((link) => (
+            {links.map(link => (
               <div
                 key={link.id}
                 className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
@@ -211,7 +245,10 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
                       <DollarSign className="h-3 w-3" />
                       <span>${link.price.toFixed(2)}</span>
                       {link.lastChecked && (
-                        <span>• Updated {new Date(link.lastChecked).toLocaleDateString()}</span>
+                        <span>
+                          • Updated{' '}
+                          {new Date(link.lastChecked).toLocaleDateString()}
+                        </span>
                       )}
                     </div>
                   )}
@@ -253,13 +290,15 @@ export function RetailerLinks({ gearItemId, initialLinks = [], onLinksUpdated }:
           <div className="space-y-2">
             <Label className="text-sm font-medium">Popular Retailers</Label>
             <div className="flex flex-wrap gap-2">
-              {popularRetailers.slice(0, 6).map((retailer) => (
+              {popularRetailers.slice(0, 6).map(retailer => (
                 <Button
                   key={retailer.name}
                   variant="outline"
                   size="sm"
                   className="text-xs"
-                  onClick={() => setNewLink({ ...newLink, name: retailer.name })}
+                  onClick={() =>
+                    setNewLink({ ...newLink, name: retailer.name })
+                  }
                 >
                   {retailer.name}
                 </Button>

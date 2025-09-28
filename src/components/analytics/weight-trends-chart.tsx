@@ -1,8 +1,23 @@
 'use client';
 
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { formatWeight } from '@/lib/utils';
 
 interface WeightTrendsChartProps {
@@ -36,7 +51,10 @@ export function WeightTrendsChart({ data }: WeightTrendsChartProps) {
 
   // Sort by creation date and format for chart
   const chartData = data
-    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    .sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )
     .map((item, index) => ({
       ...item,
       date: new Date(item.createdAt).toLocaleDateString('en-US', {
@@ -56,10 +74,16 @@ export function WeightTrendsChart({ data }: WeightTrendsChartProps) {
           <p className="font-medium">{data.name}</p>
           <p className="text-sm text-muted-foreground">Created: {data.date}</p>
           <p className="text-sm">
-            Base Weight: <span className="font-semibold">{formatWeight(data.baseWeight)}</span>
+            Base Weight:{' '}
+            <span className="font-semibold">
+              {formatWeight(data.baseWeight)}
+            </span>
           </p>
           <p className="text-sm">
-            Total Weight: <span className="font-semibold">{formatWeight(data.totalWeight)}</span>
+            Total Weight:{' '}
+            <span className="font-semibold">
+              {formatWeight(data.totalWeight)}
+            </span>
           </p>
           <p className="text-sm">Items: {data.itemCount}</p>
         </div>
@@ -80,8 +104,21 @@ export function WeightTrendsChart({ data }: WeightTrendsChartProps) {
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="order" label={{ value: 'Pack List Order', position: 'insideBottom', offset: -10 }} />
-            <YAxis label={{ value: 'Weight (kg)', angle: -90, position: 'insideLeft' }} />
+            <XAxis
+              dataKey="order"
+              label={{
+                value: 'Pack List Order',
+                position: 'insideBottom',
+                offset: -10,
+              }}
+            />
+            <YAxis
+              label={{
+                value: 'Weight (kg)',
+                angle: -90,
+                position: 'insideLeft',
+              }}
+            />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
             <Line
@@ -108,26 +145,31 @@ export function WeightTrendsChart({ data }: WeightTrendsChartProps) {
             <div className="text-2xl font-bold text-green-600">
               {formatWeight(Math.min(...data.map(d => d.baseWeight)))}
             </div>
-            <div className="text-sm text-muted-foreground">Lightest Base Weight</div>
+            <div className="text-sm text-muted-foreground">
+              Lightest Base Weight
+            </div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold">
-              {formatWeight(data.reduce((sum, d) => sum + d.baseWeight, 0) / data.length)}
+              {formatWeight(
+                data.reduce((sum, d) => sum + d.baseWeight, 0) / data.length
+              )}
             </div>
-            <div className="text-sm text-muted-foreground">Average Base Weight</div>
+            <div className="text-sm text-muted-foreground">
+              Average Base Weight
+            </div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">
               {data.length > 1
                 ? `${((data[data.length - 1].baseWeight - data[0].baseWeight) / 1000).toFixed(2)} kg`
-                : '0 kg'
-              }
+                : '0 kg'}
             </div>
             <div className="text-sm text-muted-foreground">
-              {data.length > 1 && data[data.length - 1].baseWeight < data[0].baseWeight
+              {data.length > 1 &&
+              data[data.length - 1].baseWeight < data[0].baseWeight
                 ? 'Weight Saved'
-                : 'Weight Change'
-              }
+                : 'Weight Change'}
             </div>
           </div>
         </div>

@@ -1,17 +1,24 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
-import { useState } from 'react';
 
 import { ArrowLeft, FileText, Plus } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PackListForm } from '@/components/pack-lists/pack-list-form';
 import { TemplateSelector } from '@/components/pack-lists/template-selector';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function NewPackListPage() {
   const { data: session, status } = useSession();
@@ -27,7 +34,11 @@ export default function NewPackListPage() {
     redirect('/login');
   }
 
-  const handleTemplateSelect = async (template: { id: string; name: string; description?: string }) => {
+  const handleTemplateSelect = async (template: {
+    id: string;
+    name: string;
+    description?: string;
+  }) => {
     try {
       const response = await fetch('/api/pack-lists/from-template', {
         method: 'POST',
@@ -63,7 +74,10 @@ export default function NewPackListPage() {
           title="Choose Template"
           description="Start with a pre-configured pack list"
         >
-          <Button variant="outline" onClick={() => setShowTemplateSelector(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setShowTemplateSelector(false)}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
@@ -124,14 +138,18 @@ export default function NewPackListPage() {
       <div className="max-w-4xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Template Option */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowTemplateSelector(true)}>
+          <Card
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => setShowTemplateSelector(true)}
+          >
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-6 w-6" />
                 Start from Template
               </CardTitle>
               <CardDescription>
-                Choose from pre-configured pack lists for different trip types and conditions
+                Choose from pre-configured pack lists for different trip types
+                and conditions
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -140,10 +158,18 @@ export default function NewPackListPage() {
                   Templates include:
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-muted px-2 py-1 rounded">Day Hiking</span>
-                  <span className="text-xs bg-muted px-2 py-1 rounded">Overnight</span>
-                  <span className="text-xs bg-muted px-2 py-1 rounded">Multi-day</span>
-                  <span className="text-xs bg-muted px-2 py-1 rounded">Winter</span>
+                  <span className="text-xs bg-muted px-2 py-1 rounded">
+                    Day Hiking
+                  </span>
+                  <span className="text-xs bg-muted px-2 py-1 rounded">
+                    Overnight
+                  </span>
+                  <span className="text-xs bg-muted px-2 py-1 rounded">
+                    Multi-day
+                  </span>
+                  <span className="text-xs bg-muted px-2 py-1 rounded">
+                    Winter
+                  </span>
                 </div>
                 <p className="text-sm font-medium text-primary">
                   Fastest way to get started →
@@ -153,21 +179,23 @@ export default function NewPackListPage() {
           </Card>
 
           {/* Manual Option */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowManualForm(true)}>
+          <Card
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => setShowManualForm(true)}
+          >
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Plus className="h-6 w-6" />
                 Start from Scratch
               </CardTitle>
               <CardDescription>
-                Create a completely custom pack list with your own gear and organization
+                Create a completely custom pack list with your own gear and
+                organization
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
-                  Perfect for:
-                </p>
+                <p className="text-sm text-muted-foreground">Perfect for:</p>
                 <div className="space-y-1">
                   <p className="text-sm">• Custom trip requirements</p>
                   <p className="text-sm">• Unique gear configurations</p>

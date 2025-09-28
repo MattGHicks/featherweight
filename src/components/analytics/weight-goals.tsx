@@ -1,12 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 
-import { Target, Edit2, Save, X, TrendingDown, TrendingUp } from 'lucide-react';
+import { Edit2, Save, Target, TrendingDown, TrendingUp, X } from 'lucide-react';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
@@ -22,7 +29,10 @@ interface UserGoals {
   totalWeightGoal?: number;
 }
 
-export function WeightGoals({ currentBaseWeight, currentTotalWeight }: WeightGoalsProps) {
+export function WeightGoals({
+  currentBaseWeight,
+  currentTotalWeight,
+}: WeightGoalsProps) {
   const { data: session } = useSession();
   const [goals, setGoals] = useState<UserGoals>({});
   const [isEditing, setIsEditing] = useState(false);
@@ -110,7 +120,9 @@ export function WeightGoals({ currentBaseWeight, currentTotalWeight }: WeightGoa
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-4 text-muted-foreground">Loading goals...</div>
+          <div className="text-center py-4 text-muted-foreground">
+            Loading goals...
+          </div>
         </CardContent>
       </Card>
     );
@@ -130,7 +142,11 @@ export function WeightGoals({ currentBaseWeight, currentTotalWeight }: WeightGoa
             </CardDescription>
           </div>
           {!isEditing && (
-            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(true)}
+            >
               <Edit2 className="h-4 w-4 mr-2" />
               Edit Goals
             </Button>
@@ -148,25 +164,39 @@ export function WeightGoals({ currentBaseWeight, currentTotalWeight }: WeightGoa
                   type="number"
                   step="0.1"
                   placeholder="e.g., 10"
-                  value={editGoals.baseWeightGoal ? (editGoals.baseWeightGoal / 453.592).toFixed(1) : ''}
-                  onChange={(e) => setEditGoals({
-                    ...editGoals,
-                    baseWeightGoal: formatGoalInput(e.target.value)
-                  })}
+                  value={
+                    editGoals.baseWeightGoal
+                      ? (editGoals.baseWeightGoal / 453.592).toFixed(1)
+                      : ''
+                  }
+                  onChange={e =>
+                    setEditGoals({
+                      ...editGoals,
+                      baseWeightGoal: formatGoalInput(e.target.value),
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="total-weight-goal">Total Weight Goal (lbs)</Label>
+                <Label htmlFor="total-weight-goal">
+                  Total Weight Goal (lbs)
+                </Label>
                 <Input
                   id="total-weight-goal"
                   type="number"
                   step="0.1"
                   placeholder="e.g., 15"
-                  value={editGoals.totalWeightGoal ? (editGoals.totalWeightGoal / 453.592).toFixed(1) : ''}
-                  onChange={(e) => setEditGoals({
-                    ...editGoals,
-                    totalWeightGoal: formatGoalInput(e.target.value)
-                  })}
+                  value={
+                    editGoals.totalWeightGoal
+                      ? (editGoals.totalWeightGoal / 453.592).toFixed(1)
+                      : ''
+                  }
+                  onChange={e =>
+                    setEditGoals({
+                      ...editGoals,
+                      totalWeightGoal: formatGoalInput(e.target.value),
+                    })
+                  }
                 />
               </div>
             </div>
@@ -175,7 +205,11 @@ export function WeightGoals({ currentBaseWeight, currentTotalWeight }: WeightGoa
                 <Save className="h-4 w-4 mr-2" />
                 {isSaving ? 'Saving...' : 'Save Goals'}
               </Button>
-              <Button variant="outline" onClick={handleCancel} disabled={isSaving}>
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                disabled={isSaving}
+              >
                 <X className="h-4 w-4 mr-2" />
                 Cancel
               </Button>
@@ -209,14 +243,20 @@ export function WeightGoals({ currentBaseWeight, currentTotalWeight }: WeightGoa
                           <>
                             <TrendingUp className="h-4 w-4 text-orange-500" />
                             <span className="text-orange-600">
-                              {formatWeight(currentBaseWeight - goals.baseWeightGoal)} over
+                              {formatWeight(
+                                currentBaseWeight - goals.baseWeightGoal
+                              )}{' '}
+                              over
                             </span>
                           </>
                         )}
                       </span>
                     </div>
                     <Progress
-                      value={calculateProgress(currentBaseWeight, goals.baseWeightGoal)}
+                      value={calculateProgress(
+                        currentBaseWeight,
+                        goals.baseWeightGoal
+                      )}
                       className="h-3"
                     />
                   </div>
@@ -254,14 +294,20 @@ export function WeightGoals({ currentBaseWeight, currentTotalWeight }: WeightGoa
                           <>
                             <TrendingUp className="h-4 w-4 text-orange-500" />
                             <span className="text-orange-600">
-                              {formatWeight(currentTotalWeight - goals.totalWeightGoal)} over
+                              {formatWeight(
+                                currentTotalWeight - goals.totalWeightGoal
+                              )}{' '}
+                              over
                             </span>
                           </>
                         )}
                       </span>
                     </div>
                     <Progress
-                      value={calculateProgress(currentTotalWeight, goals.totalWeightGoal)}
+                      value={calculateProgress(
+                        currentTotalWeight,
+                        goals.totalWeightGoal
+                      )}
                       className="h-3"
                     />
                   </div>

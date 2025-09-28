@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 
 interface DashboardStats {
@@ -65,9 +66,8 @@ export function useDashboardStats() {
           .map((list: any) => list.stats.baseWeight)
           .filter((weight: number) => weight > 0);
 
-        const lightestBaseWeight = baseWeights.length > 0
-          ? Math.min(...baseWeights)
-          : null;
+        const lightestBaseWeight =
+          baseWeights.length > 0 ? Math.min(...baseWeights) : null;
 
         // Get recent items (last 5)
         const recentGear = gearItems.slice(0, 5).map((item: any) => ({

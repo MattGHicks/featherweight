@@ -1,28 +1,43 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
-import { ArrowLeft, Plus, Search, Download, Share, BarChart3, Package } from 'lucide-react';
+import {
+  ArrowLeft,
+  BarChart3,
+  Download,
+  Package,
+  Plus,
+  Search,
+  Share,
+} from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { AddGearItemModal } from '@/components/pack-lists/add-gear-item-modal';
+import { PackListAnalytics } from '@/components/pack-lists/pack-list-analytics';
+import { PackListItemsTable } from '@/components/pack-lists/pack-list-items-table';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { PackListItemsTable } from '@/components/pack-lists/pack-list-items-table';
-import { AddGearItemModal } from '@/components/pack-lists/add-gear-item-modal';
-import { PackListAnalytics } from '@/components/pack-lists/pack-list-analytics';
-import { formatWeight } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 interface PackListStats {
   totalWeight: number;
@@ -73,7 +88,10 @@ export default function PackListDetailPage() {
   const packListId = params.id as string;
 
   const [packList, setPackList] = useState<PackList | null>(null);
-  const [userGoals, setUserGoals] = useState<{ baseWeightGoal?: number; totalWeightGoal?: number }>({});
+  const [userGoals, setUserGoals] = useState<{
+    baseWeightGoal?: number;
+    totalWeightGoal?: number;
+  }>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -93,7 +111,7 @@ export default function PackListDetailPage() {
         // Fetch pack list and user goals in parallel
         const [packListResponse, goalsResponse] = await Promise.all([
           fetch(`/api/pack-lists/${packListId}`),
-          fetch('/api/user/goals')
+          fetch('/api/user/goals'),
         ]);
 
         if (!packListResponse.ok) {
@@ -113,7 +131,9 @@ export default function PackListDetailPage() {
         }
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load pack list');
+        setError(
+          err instanceof Error ? err.message : 'Failed to load pack list'
+        );
       } finally {
         setIsLoading(false);
       }
@@ -158,10 +178,15 @@ export default function PackListDetailPage() {
   }
 
   // Filter items based on search term
-  const filteredItems = packList.items.filter(item =>
-    item.gearItem.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.gearItem.category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.gearItem.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredItems = packList.items.filter(
+    item =>
+      item.gearItem.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.gearItem.category.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      item.gearItem.description
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase())
   );
 
   const handleItemAdded = (newItem: PackListItem) => {
@@ -173,12 +198,18 @@ export default function PackListDetailPage() {
         stats: {
           ...prev.stats,
           itemCount: prev.stats.itemCount + 1,
-          totalWeight: prev.stats.totalWeight + (newItem.isIncluded ? newItem.gearItem.weight * newItem.quantity : 0),
-          baseWeight: prev.stats.baseWeight + (
-            newItem.isIncluded && !newItem.gearItem.isConsumable && !newItem.gearItem.isWorn
+          totalWeight:
+            prev.stats.totalWeight +
+            (newItem.isIncluded
               ? newItem.gearItem.weight * newItem.quantity
-              : 0
-          ),
+              : 0),
+          baseWeight:
+            prev.stats.baseWeight +
+            (newItem.isIncluded &&
+            !newItem.gearItem.isConsumable &&
+            !newItem.gearItem.isWorn
+              ? newItem.gearItem.weight * newItem.quantity
+              : 0),
         },
       };
     });
@@ -204,7 +235,11 @@ export default function PackListDetailPage() {
       }, 0);
 
       const baseWeight = newItems.reduce((sum, item) => {
-        if (item.isIncluded && !item.gearItem.isConsumable && !item.gearItem.isWorn) {
+        if (
+          item.isIncluded &&
+          !item.gearItem.isConsumable &&
+          !item.gearItem.isWorn
+        ) {
           return sum + item.gearItem.weight * item.quantity;
         }
         return sum;
@@ -237,7 +272,11 @@ export default function PackListDetailPage() {
       }, 0);
 
       const baseWeight = newItems.reduce((sum, item) => {
-        if (item.isIncluded && !item.gearItem.isConsumable && !item.gearItem.isWorn) {
+        if (
+          item.isIncluded &&
+          !item.gearItem.isConsumable &&
+          !item.gearItem.isWorn
+        ) {
           return sum + item.gearItem.weight * item.quantity;
         }
         return sum;
@@ -258,7 +297,16 @@ export default function PackListDetailPage() {
   const exportAsCSV = () => {
     if (!packList) return;
 
-    const headers = ['Item Name', 'Category', 'Description', 'Qty', 'Weight (g)', 'Unit Weight (g)', 'Type', 'Included'];
+    const headers = [
+      'Item Name',
+      'Category',
+      'Description',
+      'Qty',
+      'Weight (g)',
+      'Unit Weight (g)',
+      'Type',
+      'Included',
+    ];
     const rows = packList.items.map(item => [
       item.gearItem.name,
       item.gearItem.category.name,
@@ -266,7 +314,8 @@ export default function PackListDetailPage() {
       item.quantity,
       item.gearItem.weight * item.quantity,
       item.gearItem.weight,
-      `${item.gearItem.isWorn ? 'Worn' : ''}${item.gearItem.isConsumable ? ' Consumable' : ''}`.trim() || 'Base',
+      `${item.gearItem.isWorn ? 'Worn' : ''}${item.gearItem.isConsumable ? ' Consumable' : ''}`.trim() ||
+        'Base',
       item.isIncluded ? 'Yes' : 'No',
     ]);
 
@@ -278,7 +327,10 @@ export default function PackListDetailPage() {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `${packList.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.csv`);
+    link.setAttribute(
+      'download',
+      `${packList.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.csv`
+    );
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -364,7 +416,11 @@ export default function PackListDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {packList.stats.baseWeight > 0 ? formatWeight(packList.stats.baseWeight) : '--'}
+              {packList.stats.baseWeight > 0 ? (
+                <WeightDisplay grams={packList.stats.baseWeight} />
+              ) : (
+                '--'
+              )}
             </div>
             <CardDescription>Excluding worn & consumable</CardDescription>
           </CardContent>
@@ -376,7 +432,11 @@ export default function PackListDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {packList.stats.totalWeight > 0 ? formatWeight(packList.stats.totalWeight) : '--'}
+              {packList.stats.totalWeight > 0 ? (
+                <WeightDisplay grams={packList.stats.totalWeight} />
+              ) : (
+                '--'
+              )}
             </div>
             <CardDescription>All included items</CardDescription>
           </CardContent>
@@ -406,7 +466,7 @@ export default function PackListDetailPage() {
                   placeholder="Search gear items..."
                   className="pl-8"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={e => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
@@ -430,10 +490,7 @@ export default function PackListDetailPage() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <PackListAnalytics
-            items={packList.items}
-            userGoals={userGoals}
-          />
+          <PackListAnalytics items={packList.items} userGoals={userGoals} />
         </TabsContent>
       </Tabs>
 
