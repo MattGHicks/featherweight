@@ -1,11 +1,11 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { Package, Plus, Table as TableIcon, Grid3X3 } from 'lucide-react';
+import { Package, Plus, Table as TableIcon, Grid3X3, Upload, Smartphone } from 'lucide-react';
 
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
@@ -14,25 +14,53 @@ import { GearTable } from '@/components/gear/gear-table';
 import { GearFilters } from '@/components/gear/gear-filters';
 import { GearItemCard } from '@/components/gear/gear-item-card';
 import { GearEditDialog } from '@/components/gear/gear-edit-dialog';
+import { CSVImportDialog } from '@/components/gear/csv-import-dialog';
+import { BulkOperations } from '@/components/gear/bulk-operations';
+import { MobileGearList } from '@/components/gear/mobile-gear-list';
+import { FloatingActionButton } from '@/components/ui/floating-action-button';
+import { TouchButton } from '@/components/ui/touch-friendly-button';
 import { useGear } from '@/hooks/use-gear';
 import { formatWeight } from '@/lib/utils';
 
-type ViewMode = 'table' | 'grid';
+type ViewMode = 'table' | 'grid' | 'mobile';
 
 export default function GearPage() {
   const { data: session, status } = useSession();
   const { gearItems, categories, isLoading, error, deleteGearItem, updateGearItem } = useGear();
 
-  // View and filter state
+  // Mobile detection
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  // View and filter state - automatically set mobile view on mobile devices
   const [viewMode, setViewMode] = useState<ViewMode>('table');
+
+  useEffect(() => {
+    if (isMobile && viewMode !== 'mobile') {
+      setViewMode('mobile');
+    }
+  }, [isMobile, viewMode]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
-  // Edit dialog state
+  // Selection state for bulk operations
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
+  // Dialog state
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [csvImportOpen, setCsvImportOpen] = useState(false);
 
   if (status === 'loading') {
     return (
@@ -49,21 +77,7 @@ export default function GearPage() {
     redirect('/login');
   }
 
-  if (error) {
-    return (
-      <div
-        className="w-full min-h-screen flex items-center justify-center"
-        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
-      >
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Error loading gear items</p>
-          <Button onClick={() => window.location.reload()}>Retry</Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Enhanced filtering logic
+  // Enhanced filtering logic - moved before early returns to fix hooks rule
   const filteredGearItems = useMemo(() => {
     return gearItems.filter(item => {
       // Search filter
@@ -87,10 +101,29 @@ export default function GearPage() {
 
   const hasActiveFilters = !!(searchTerm || selectedCategory || selectedType);
 
+  if (error) {
+    return (
+      <div
+        className="w-full min-h-screen flex items-center justify-center"
+        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+      >
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading gear items</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
+
   const handleClearFilters = () => {
     setSearchTerm('');
     setSelectedCategory(null);
     setSelectedType(null);
+  };
+
+  const handleItemsUpdated = () => {
+    // Refresh gear data after bulk operations
+    window.location.reload();
   };
 
   const handleEdit = (item: any) => {
@@ -141,32 +174,58 @@ export default function GearPage() {
         description="Manage all your gear items with detailed weight tracking"
       >
         <div className="flex gap-2">
-          {/* View Mode Toggle */}
-          <div className="flex border rounded-md">
-            <Button
-              variant={viewMode === 'table' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('table')}
-              className="border-none rounded-r-none"
-            >
-              <TableIcon className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === 'grid' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('grid')}
-              className="border-none rounded-l-none"
-            >
-              <Grid3X3 className="h-4 w-4" />
-            </Button>
-          </div>
+          {/* View Mode Toggle - Hidden on mobile since mobile view is automatic */}
+          {!isMobile && (
+            <div className="flex border rounded-md">
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+                className="border-none rounded-r-none"
+              >
+                <TableIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="border-none rounded-none"
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'mobile' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('mobile')}
+                className="border-none rounded-l-none"
+              >
+                <Smartphone className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
 
-          <Button asChild>
-            <Link href="/gear/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Gear
-            </Link>
-          </Button>
+          {!isMobile && (
+            <Button variant="outline" onClick={() => setCsvImportOpen(true)}>
+              <Upload className="mr-2 h-4 w-4" />
+              Import CSV
+            </Button>
+          )}
+
+          {isMobile ? (
+            <TouchButton asChild>
+              <Link href="/gear/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Gear
+              </Link>
+            </TouchButton>
+          ) : (
+            <Button asChild>
+              <Link href="/gear/new">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Gear
+              </Link>
+            </Button>
+          )}
         </div>
       </PageHeader>
 
@@ -184,6 +243,17 @@ export default function GearPage() {
           onClearFilters={handleClearFilters}
         />
       </div>
+
+      {/* Bulk Operations - Hidden on mobile */}
+      {!isMobile && (
+        <BulkOperations
+          selectedItems={selectedItems}
+          items={filteredGearItems}
+          categories={categories}
+          onItemsUpdated={handleItemsUpdated}
+          onSelectionChange={setSelectedItems}
+        />
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
@@ -224,7 +294,34 @@ export default function GearPage() {
               gearItems={filteredGearItems}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              selectedItems={selectedItems}
+              onItemSelectionChange={(itemId, selected) => {
+                if (selected) {
+                  setSelectedItems([...selectedItems, itemId]);
+                } else {
+                  setSelectedItems(selectedItems.filter(id => id !== itemId));
+                }
+              }}
             />
+          ) : viewMode === 'mobile' ? (
+            <>
+              <div className="mb-4 text-sm text-muted-foreground">
+                {filteredGearItems.length} item{filteredGearItems.length !== 1 ? 's' : ''}
+                {hasActiveFilters && ' (filtered)'}
+                • Total weight: {formatWeight(filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0))}
+              </div>
+              <MobileGearList
+                items={filteredGearItems}
+                onEdit={handleEdit}
+                onDelete={async (id) => {
+                  const item = filteredGearItems.find(item => item.id === id);
+                  if (item) {
+                    await handleDelete(item);
+                  }
+                }}
+                isLoading={isLoading}
+              />
+            </>
           ) : (
             <>
               <div className="mb-4 text-sm text-muted-foreground">
@@ -265,6 +362,30 @@ export default function GearPage() {
         onSubmit={handleUpdate}
         isLoading={isUpdating}
       />
+
+      <CSVImportDialog
+        isOpen={csvImportOpen}
+        onClose={() => setCsvImportOpen(false)}
+        onImportComplete={() => {
+          // Refresh gear data after import
+          window.location.reload();
+        }}
+      />
+
+      {/* Mobile Floating Action Button */}
+      {isMobile && (
+        <FloatingActionButton
+          actions={[
+            {
+              icon: <Upload className="h-5 w-5" />,
+              label: 'Import CSV',
+              onClick: () => setCsvImportOpen(true),
+              variant: 'secondary',
+            },
+          ]}
+          mainAction={() => window.location.href = '/gear/new'}
+        />
+      )}
     </div>
   );
 }

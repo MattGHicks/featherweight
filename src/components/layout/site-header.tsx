@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Backpack, LogOut, Settings, User } from 'lucide-react';
 
 import { MobileNav } from '@/components/layout/mobile-nav';
+import { GlobalSearch } from '@/components/search/global-search';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,42 +43,50 @@ export function SiteHeader() {
           </Link>
         </div>
 
-        {/* Desktop Navigation - Hidden on mobile/tablet */}
-        <nav
-          className="hidden md:flex items-center flex-1 justify-center"
-          style={{ gap: 'clamp(1rem, 2vw, 2rem)' }}
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          {session ? (
+        {/* Center section - Search and Navigation */}
+        <div className="flex-1 flex items-center justify-center max-w-2xl mx-4">
+          {session && (
             <>
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+              {/* Global Search - Visible on desktop */}
+              <div className="hidden md:block flex-1 max-w-md">
+                <GlobalSearch />
+              </div>
+
+              {/* Desktop Navigation - Right side */}
+              <nav
+                className="hidden md:flex items-center ml-6"
+                style={{ gap: 'clamp(1rem, 2vw, 2rem)' }}
+                role="navigation"
+                aria-label="Main navigation"
               >
-                Dashboard
-              </Link>
-              <Link
-                href="/gear"
-                className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
-              >
-                Gear
-              </Link>
-              <Link
-                href="/lists"
-                className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
-              >
-                Pack Lists
-              </Link>
-              <Link
-                href="/analytics"
-                className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
-              >
-                Analytics
-              </Link>
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/gear"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+                >
+                  Gear
+                </Link>
+                <Link
+                  href="/lists"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+                >
+                  Pack Lists
+                </Link>
+                <Link
+                  href="/analytics"
+                  className="text-sm font-medium transition-colors hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm px-2 py-1"
+                >
+                  Analytics
+                </Link>
+              </nav>
             </>
-          ) : null}
-        </nav>
+          )}
+        </div>
 
         {/* Right side - User menu/Sign In button and Mobile menu */}
         <div

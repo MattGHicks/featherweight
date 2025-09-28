@@ -15,6 +15,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,9 +60,17 @@ interface GearTableProps {
   gearItems: GearItem[];
   onEdit?: (item: GearItem) => void;
   onDelete?: (item: GearItem) => void;
+  selectedItems?: string[];
+  onItemSelectionChange?: (itemId: string, selected: boolean) => void;
 }
 
-export function GearTable({ gearItems, onEdit, onDelete }: GearTableProps) {
+export function GearTable({
+  gearItems,
+  onEdit,
+  onDelete,
+  selectedItems = [],
+  onItemSelectionChange
+}: GearTableProps) {
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -236,6 +245,19 @@ export function GearTable({ gearItems, onEdit, onDelete }: GearTableProps) {
             <Table>
               <TableHeader>
                 <TableRow>
+                  {onItemSelectionChange && (
+                    <TableHead className="w-[50px]">
+                      <Checkbox
+                        checked={selectedItems.length === gearItems.length && gearItems.length > 0}
+                        onCheckedChange={(checked) => {
+                          gearItems.forEach((item) => {
+                            onItemSelectionChange(item.id, checked as boolean);
+                          });
+                        }}
+                        aria-label="Select all items"
+                      />
+                    </TableHead>
+                  )}
                   <TableHead className="min-w-[200px]">
                     <Button
                       variant="ghost"
@@ -303,13 +325,24 @@ export function GearTable({ gearItems, onEdit, onDelete }: GearTableProps) {
               <TableBody>
                 {sortedItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={onItemSelectionChange ? 9 : 8} className="text-center text-muted-foreground py-8">
                       No gear items found
                     </TableCell>
                   </TableRow>
                 ) : (
                   sortedItems.map((item) => (
                     <TableRow key={item.id} className="hover:bg-muted/50">
+                      {onItemSelectionChange && (
+                        <TableCell className="p-4">
+                          <Checkbox
+                            checked={selectedItems.includes(item.id)}
+                            onCheckedChange={(checked) => {
+                              onItemSelectionChange(item.id, checked as boolean);
+                            }}
+                            aria-label={`Select ${item.name}`}
+                          />
+                        </TableCell>
+                      )}
                       <TableCell className="p-4">
                         <div>
                           <div className="font-medium">{item.name}</div>

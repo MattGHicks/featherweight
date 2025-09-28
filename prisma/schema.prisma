@@ -20,7 +20,10 @@ model User {
   name            String?
   image           String?
   preferredUnits  String  @default("imperial") // "metric" or "imperial"
-  baseWeightGoal  Float?  // in grams
+  // Weight goals
+  baseWeightGoal  Float?   // in grams
+  totalWeightGoal Float?   // in grams
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -29,6 +32,7 @@ model User {
   sessions        Session[]
   gearItems       GearItem[]
   packLists       PackList[]
+  createdTemplates PackListTemplate[]
 
   @@map("users")
 }
@@ -83,6 +87,7 @@ model Category {
 
   // Relations
   gearItems GearItem[]
+  templateItems PackListTemplateItem[]
 
   @@map("categories")
 }
@@ -106,6 +111,7 @@ model GearItem {
   user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   category     Category        @relation(fields: [categoryId], references: [id])
   packListItems PackListItem[]
+  retailerLinks RetailerLink[]
 
   @@map("gear_items")
 }
@@ -142,4 +148,59 @@ model PackListItem {
 
   @@unique([packListId, gearItemId])
   @@map("pack_list_items")
+}
+
+model RetailerLink {
+  id          String   @id @default(cuid())
+  gearItemId  String   @map("gear_item_id")
+  name        String   // Retailer name (e.g., "REI", "Amazon")
+  url         String   // Product URL
+  price       Float?   // Current price in USD
+  lastChecked DateTime? @map("last_checked") // When price was last updated
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  gearItem GearItem @relation(fields: [gearItemId], references: [id], onDelete: Cascade)
+
+  @@map("retailer_links")
+}
+
+model PackListTemplate {
+  id            String   @id @default(cuid())
+  name          String   // Template name (e.g., "Ultralight Overnight", "3-Season Backpacking")
+  description   String?  // Template description
+  category      String   // Category (e.g., "Overnight", "Multi-day", "Thru-hiking")
+  season        String   // Season (e.g., "3-season", "Winter", "Summer")
+  difficulty    String   // Difficulty (e.g., "Beginner", "Intermediate", "Advanced")
+  isPublic      Boolean  @default(true) // Whether template is available to all users
+  createdBy     String?  @map("created_by") // User ID who created (null for system templates)
+  templateItems PackListTemplateItem[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  creator User? @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("pack_list_templates")
+}
+
+model PackListTemplateItem {
+  id               String    @id @default(cuid())
+  templateId       String    @map("template_id")
+  categoryId       String    @map("category_id")
+  itemName         String    @map("item_name") // Generic item name (e.g., "Sleeping Bag", "Tent")
+  description      String?   // Optional description or specs
+  estimatedWeight  Float     @map("estimated_weight") // Estimated weight in grams
+  quantity         Int       @default(1)
+  isEssential      Boolean   @default(true) @map("is_essential") // Whether item is essential for this trip type
+  priority         Int       @default(1) // Priority (1=high, 2=medium, 3=low)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relations
+  template PackListTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  category Category         @relation(fields: [categoryId], references: [id])
+
+  @@map("pack_list_template_items")
 }

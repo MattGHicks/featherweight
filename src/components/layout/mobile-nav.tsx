@@ -19,6 +19,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 
+import { GlobalSearch } from '@/components/search/global-search';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -102,6 +103,13 @@ export function MobileNav() {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Global Search (if authenticated) */}
+          {session && (
+            <div className="p-6 border-b">
+              <GlobalSearch />
             </div>
           )}
 
