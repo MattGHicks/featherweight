@@ -20,7 +20,7 @@ import { MobileGearList } from '@/components/gear/mobile-gear-list';
 import { FloatingActionButton } from '@/components/ui/floating-action-button';
 import { TouchButton } from '@/components/ui/touch-friendly-button';
 import { useGear } from '@/hooks/use-gear';
-import { formatWeight } from '@/lib/utils';
+import { WeightDisplay } from '@/components/ui/weight-display';
 
 type ViewMode = 'table' | 'grid' | 'mobile';
 
@@ -62,22 +62,7 @@ export default function GearPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [csvImportOpen, setCsvImportOpen] = useState(false);
 
-  if (status === 'loading') {
-    return (
-      <div
-        className="w-full min-h-screen flex items-center justify-center"
-        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
-      >
-        Loading...
-      </div>
-    );
-  }
-
-  if (!session) {
-    redirect('/login');
-  }
-
-  // Enhanced filtering logic - moved before early returns to fix hooks rule
+  // Enhanced filtering logic - MUST be before early returns to follow hooks rules
   const filteredGearItems = useMemo(() => {
     return gearItems.filter(item => {
       // Search filter
@@ -98,6 +83,21 @@ export default function GearPage() {
       return matchesSearch && matchesCategory && matchesType;
     });
   }, [gearItems, searchTerm, selectedCategory, selectedType]);
+
+  if (status === 'loading') {
+    return (
+      <div
+        className="w-full min-h-screen flex items-center justify-center"
+        style={{ padding: '2rem clamp(2rem, 5vw, 8rem)' }}
+      >
+        Loading...
+      </div>
+    );
+  }
+
+  if (!session) {
+    redirect('/login');
+  }
 
   const hasActiveFilters = !!(searchTerm || selectedCategory || selectedType);
 
@@ -140,6 +140,7 @@ export default function GearPage() {
         weight: data.weight,
         quantity: data.quantity,
         categoryId: data.categoryId,
+        imageUrl: data.imageUrl,
         isWorn: data.isWorn,
         isConsumable: data.isConsumable,
         retailerUrl: data.retailerUrl,
@@ -308,7 +309,7 @@ export default function GearPage() {
               <div className="mb-4 text-sm text-muted-foreground">
                 {filteredGearItems.length} item{filteredGearItems.length !== 1 ? 's' : ''}
                 {hasActiveFilters && ' (filtered)'}
-                • Total weight: {formatWeight(filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0))}
+                • Total weight: <WeightDisplay grams={filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0)} />
               </div>
               <MobileGearList
                 items={filteredGearItems}
@@ -327,7 +328,7 @@ export default function GearPage() {
               <div className="mb-4 text-sm text-muted-foreground">
                 {filteredGearItems.length} item{filteredGearItems.length !== 1 ? 's' : ''}
                 {hasActiveFilters && ' (filtered)'}
-                • Total weight: {formatWeight(filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0))}
+                • Total weight: <WeightDisplay grams={filteredGearItems.reduce((sum, item) => sum + (item.weight * item.quantity), 0)} />
               </div>
               <div
                 className="grid gap-6"
@@ -341,7 +342,6 @@ export default function GearPage() {
                     item={item}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
-                    units="metric"
                   />
                 ))}
               </div>

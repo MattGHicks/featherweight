@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { ImageUpload } from '@/components/ui/image-upload';
 import type { Category, GearItem } from '@/types';
 
 const gearFormSchema = z.object({
@@ -33,6 +34,7 @@ const gearFormSchema = z.object({
   weight: z.number().min(0, 'Weight must be positive'),
   quantity: z.number().min(1, 'Quantity must be at least 1'),
   categoryId: z.string().min(1, 'Category is required'),
+  imageUrl: z.string().url().optional().or(z.literal('')),
   isWorn: z.boolean(),
   isConsumable: z.boolean(),
   retailerUrl: z.string().url().optional().or(z.literal('')),
@@ -65,6 +67,7 @@ export function GearForm({
       weight: initialData?.weight || 0,
       quantity: initialData?.quantity || 1,
       categoryId: initialData?.categoryId || '',
+      imageUrl: initialData?.imageUrl || '',
       isWorn: initialData?.isWorn || false,
       isConsumable: initialData?.isConsumable || false,
       retailerUrl: initialData?.retailerUrl || '',
@@ -195,6 +198,46 @@ export function GearForm({
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name="imageUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image</FormLabel>
+              <div className="space-y-4">
+                <div>
+                  <FormLabel className="text-sm font-normal text-muted-foreground">Upload Image</FormLabel>
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    onRemove={() => field.onChange('')}
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or enter URL
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <FormControl>
+                    <Input type="url" placeholder="https://..." {...field} />
+                  </FormControl>
+                </div>
+              </div>
+              <FormDescription>
+                Upload an image file or provide a URL to an existing image
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}

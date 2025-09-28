@@ -8,12 +8,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { GearForm } from './gear-form';
-import type { Category, GearItem } from '@/types';
+import type { Category, GearItem, GearItemWithCategory } from '@/types';
 
 interface GearEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  gearItem: GearItem | null;
+  gearItem: GearItemWithCategory | null;
   categories: Category[];
   onSubmit: (data: any) => Promise<void>;
   isLoading?: boolean;
@@ -52,6 +52,7 @@ export function GearEditDialog({
             weight: gearItem.weight,
             quantity: gearItem.quantity,
             categoryId: gearItem.category.id,
+            imageUrl: gearItem.imageUrl,
             isWorn: gearItem.isWorn,
             isConsumable: gearItem.isConsumable,
             retailerUrl: gearItem.retailerUrl,
