@@ -1,6 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Sparkles } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -59,6 +62,11 @@ export function GearForm({
   isLoading = false,
   submitLabel = 'Save',
 }: GearFormProps) {
+  const [isEnriching, setIsEnriching] = useState(false);
+  const [enrichmentFields, setEnrichmentFields] = useState<Set<string>>(
+    new Set()
+  );
+
   const form = useForm<GearFormValues>({
     resolver: zodResolver(gearFormSchema),
     defaultValues: {
@@ -78,6 +86,145 @@ export function GearForm({
     await onSubmit(data);
   };
 
+  const handleAIEnrich = async () => {
+    const itemName = form.getValues('name');
+    if (!itemName || itemName.trim().length === 0) {
+      return;
+    }
+
+    setIsEnriching(true);
+    setEnrichmentFields(new Set());
+
+    try {
+      const response = await fetch('/api/gear/enrich', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: itemName,
+          category: form.getValues('categoryId'),
+          description: form.getValues('description'),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to enrich gear data');
+      }
+
+      const result = await response.json();
+      const enrichmentData = result.data;
+
+      // Track which fields were enriched
+      const fieldsEnriched = new Set<string>();
+
+      // Update fields with AI data, showing override behavior
+      const currentValues = form.getValues();
+
+      if (enrichmentData.description) {
+        const hasExistingDescription =
+          currentValues.description &&
+          currentValues.description.trim().length > 0;
+        if (
+          !hasExistingDescription ||
+          currentValues.description === 'Brand, model, notes...'
+        ) {
+          form.setValue('description', enrichmentData.description);
+          fieldsEnriched.add('description');
+        } else {
+          // For existing descriptions, we could ask user or just skip
+          // For now, let's override if it's clearly placeholder text
+          if (
+            currentValues.description.includes('Brand, model, notes') ||
+            currentValues.description.length < 10
+          ) {
+            form.setValue('description', enrichmentData.description);
+            fieldsEnriched.add('description');
+          }
+        }
+      }
+
+      if (enrichmentData.weight && enrichmentData.weight > 0) {
+        // Always update weight if AI provides a reasonable value
+        if (currentValues.weight === 0 || currentValues.weight === undefined) {
+          form.setValue('weight', enrichmentData.weight);
+          fieldsEnriched.add('weight');
+        } else {
+          // Override existing weight if it seems like a default/placeholder
+          form.setValue('weight', enrichmentData.weight);
+          fieldsEnriched.add('weight');
+        }
+      }
+
+      // Find matching category by name
+      if (enrichmentData.category && !currentValues.categoryId) {
+        const matchingCategory = categories.find(
+          cat =>
+            cat.name.toLowerCase() === enrichmentData.category?.toLowerCase()
+        );
+        if (matchingCategory) {
+          form.setValue('categoryId', matchingCategory.id);
+          fieldsEnriched.add('categoryId');
+        }
+      }
+
+      // Add retailer URL if provided by AI
+      if (
+        enrichmentData.retailerUrls &&
+        enrichmentData.retailerUrls.length > 0
+      ) {
+        const bestRetailerUrl = enrichmentData.retailerUrls[0];
+        if (
+          !currentValues.retailerUrl ||
+          currentValues.retailerUrl.trim().length === 0
+        ) {
+          form.setValue('retailerUrl', bestRetailerUrl);
+          fieldsEnriched.add('retailerUrl');
+        }
+      }
+
+      // Search for gear image using the actual product name (more accurate than AI search terms)
+      if (!currentValues.imageUrl) {
+        try {
+          // Use the actual product name from the form for better image accuracy
+          const gearName = currentValues.name || itemName;
+
+          // Search for image via our API endpoint
+          const imageResponse = await fetch('/api/gear/search-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ searchTerm: gearName }),
+          });
+
+          if (imageResponse.ok) {
+            const imageResult = await imageResponse.json();
+            if (imageResult.imageUrl) {
+              form.setValue('imageUrl', imageResult.imageUrl);
+              fieldsEnriched.add('imageUrl');
+            }
+          }
+        } catch (error) {
+          console.error('Failed to search for gear image:', error);
+          // Continue without image - not a critical failure
+        }
+      }
+
+      setEnrichmentFields(fieldsEnriched);
+
+      // Show success message (could be a toast notification)
+      console.log(
+        `AI enriched ${fieldsEnriched.size} fields with ${enrichmentData.confidence * 100}% confidence`
+      );
+    } catch (error) {
+      console.error('AI enrichment failed:', error);
+      // In a full implementation, show an error toast
+    } finally {
+      setIsEnriching(false);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -87,10 +234,33 @@ export function GearForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Tent, sleeping bag, etc." {...field} />
-              </FormControl>
+              <div className="flex gap-2">
+                <FormControl>
+                  <Input placeholder="Tent, sleeping bag, etc." {...field} />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAIEnrich}
+                  disabled={isEnriching || isLoading || !field.value?.trim()}
+                  className="shrink-0"
+                >
+                  {isEnriching ? (
+                    <LoadingSpinner size="sm" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  {isEnriching ? 'Enriching...' : 'AI Assist'}
+                </Button>
+              </div>
               <FormMessage />
+              {enrichmentFields.size > 0 && (
+                <FormDescription className="text-blue-600">
+                  ✨ AI filled {enrichmentFields.size} field
+                  {enrichmentFields.size !== 1 ? 's' : ''} for you
+                </FormDescription>
+              )}
             </FormItem>
           )}
         />
@@ -100,7 +270,12 @@ export function GearForm({
           name="categoryId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel className="flex items-center gap-1">
+                Category
+                {enrichmentFields.has('categoryId') && (
+                  <span className="text-xs text-blue-600">✨</span>
+                )}
+              </FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -132,7 +307,12 @@ export function GearForm({
             name="weight"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Weight (grams)</FormLabel>
+                <FormLabel className="flex items-center gap-1">
+                  Weight (grams)
+                  {enrichmentFields.has('weight') && (
+                    <span className="text-xs text-blue-600">✨</span>
+                  )}
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -178,7 +358,12 @@ export function GearForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel className="flex items-center gap-1">
+                Description
+                {enrichmentFields.has('description') && (
+                  <span className="text-xs text-blue-600">✨</span>
+                )}
+              </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Brand, model, notes..."
@@ -199,7 +384,12 @@ export function GearForm({
           name="imageUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image</FormLabel>
+              <FormLabel className="flex items-center gap-1">
+                Image
+                {enrichmentFields.has('imageUrl') && (
+                  <span className="text-xs text-blue-600">✨</span>
+                )}
+              </FormLabel>
               <div className="space-y-3">
                 <div>
                   <FormControl>

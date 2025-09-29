@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
 const updateGearItemSchema = z.object({
   name: z.string().min(1, 'Name is required').optional(),
   description: z.string().optional(),
-  weight: z.number().positive('Weight must be positive').optional(),
+  weight: z.number().min(0, 'Weight must be positive').optional(),
   quantity: z.number().int().positive().optional(),
   categoryId: z.string().min(1, 'Category is required').optional(),
   imageUrl: z.string().url().optional().or(z.literal('')),

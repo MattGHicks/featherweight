@@ -245,7 +245,9 @@ export function GearTable({
                             <div className="font-medium">{item.name}</div>
                             {item.description && (
                               <div className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                                {item.description}
+                                {item.description.length > 60
+                                  ? `${item.description.substring(0, 60)}...`
+                                  : item.description}
                               </div>
                             )}
                           </div>

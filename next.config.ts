@@ -122,6 +122,35 @@ const nextConfig: NextConfig = {
         protocol: 'http',
         hostname: '*.com',
       },
+      // International domains for gear retailers
+      {
+        protocol: 'https',
+        hostname: '*.sk', // Slovakia (outdoorline.sk)
+      },
+      {
+        protocol: 'https',
+        hostname: '*.de', // Germany
+      },
+      {
+        protocol: 'https',
+        hostname: '*.uk', // United Kingdom
+      },
+      {
+        protocol: 'https',
+        hostname: '*.eu', // European Union
+      },
+      {
+        protocol: 'https',
+        hostname: '*.ca', // Canada
+      },
+      {
+        protocol: 'https',
+        hostname: '*.org',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.net',
+      },
     ],
   },
 };
