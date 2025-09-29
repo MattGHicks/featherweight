@@ -234,8 +234,8 @@ export function GearForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
-              <div className="flex gap-2">
-                <FormControl>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <FormControl className="flex-1">
                   <Input placeholder="Tent, sleeping bag, etc." {...field} />
                 </FormControl>
                 <Button
@@ -244,7 +244,7 @@ export function GearForm({
                   size="sm"
                   onClick={handleAIEnrich}
                   disabled={isEnriching || isLoading || !field.value?.trim()}
-                  className="shrink-0"
+                  className="shrink-0 w-full sm:w-auto"
                 >
                   {isEnriching ? (
                     <LoadingSpinner size="sm" />
