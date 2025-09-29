@@ -64,7 +64,7 @@ export function PackListAnalytics({
   preferredUnit,
 }: PackListAnalyticsProps) {
   const analytics = useMemo(() => {
-    const includedItems = items.filter(item => item.isIncluded);
+    const includedItems = items; // All items are included now (no checkbox concept)
 
     // Calculate weights
     const totalWeight = includedItems.reduce(
@@ -464,17 +464,18 @@ export function PackListAnalytics({
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {analytics.heaviestItems.slice(0, 3).map((item, index) => (
+            {analytics.heaviestItems.slice(0, 3).map(item => (
               <div key={item.name} className="p-3 rounded-lg bg-muted/30">
                 <div className="font-medium text-sm mb-1">
                   Consider lighter alternatives for: {item.name}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Currently <WeightDisplay
+                  Currently{' '}
+                  <WeightDisplay
                     grams={item.weight}
                     preferredUnit={preferredUnit}
-                  /> • Could
-                  potentially save 20-40% weight
+                  />{' '}
+                  • Could potentially save 20-40% weight
                 </div>
               </div>
             ))}
@@ -490,7 +491,8 @@ export function PackListAnalytics({
                     <WeightDisplay
                       grams={userGoals.baseWeightGoal}
                       preferredUnit={preferredUnit}
-                    /> goal.
+                    />{' '}
+                    goal.
                   </div>
                 </div>
               )}

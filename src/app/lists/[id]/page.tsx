@@ -6,8 +6,6 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { redirect, useParams } from 'next/navigation';
 
-import { useUserPreferences } from '@/contexts/user-preferences-context';
-
 import {
   ArrowLeft,
   BarChart3,
@@ -40,6 +38,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { WeightDisplay } from '@/components/ui/weight-display';
+import { useUserPreferences } from '@/contexts/user-preferences-context';
 
 interface PackListStats {
   totalWeight: number;
@@ -202,15 +201,10 @@ export default function PackListDetailPage() {
           ...prev.stats,
           itemCount: prev.stats.itemCount + 1,
           totalWeight:
-            prev.stats.totalWeight +
-            (newItem.isIncluded
-              ? newItem.gearItem.weight * newItem.quantity
-              : 0),
+            prev.stats.totalWeight + newItem.gearItem.weight * newItem.quantity,
           baseWeight:
             prev.stats.baseWeight +
-            (newItem.isIncluded &&
-            !newItem.gearItem.isConsumable &&
-            !newItem.gearItem.isWorn
+            (!newItem.gearItem.isConsumable && !newItem.gearItem.isWorn
               ? newItem.gearItem.weight * newItem.quantity
               : 0),
         },
@@ -231,18 +225,11 @@ export default function PackListDetailPage() {
 
       // Recalculate stats
       const totalWeight = newItems.reduce((sum, item) => {
-        if (item.isIncluded) {
-          return sum + item.gearItem.weight * item.quantity;
-        }
-        return sum;
+        return sum + item.gearItem.weight * item.quantity;
       }, 0);
 
       const baseWeight = newItems.reduce((sum, item) => {
-        if (
-          item.isIncluded &&
-          !item.gearItem.isConsumable &&
-          !item.gearItem.isWorn
-        ) {
+        if (!item.gearItem.isConsumable && !item.gearItem.isWorn) {
           return sum + item.gearItem.weight * item.quantity;
         }
         return sum;
@@ -268,18 +255,11 @@ export default function PackListDetailPage() {
 
       // Recalculate stats
       const totalWeight = newItems.reduce((sum, item) => {
-        if (item.isIncluded) {
-          return sum + item.gearItem.weight * item.quantity;
-        }
-        return sum;
+        return sum + item.gearItem.weight * item.quantity;
       }, 0);
 
       const baseWeight = newItems.reduce((sum, item) => {
-        if (
-          item.isIncluded &&
-          !item.gearItem.isConsumable &&
-          !item.gearItem.isWorn
-        ) {
+        if (!item.gearItem.isConsumable && !item.gearItem.isWorn) {
           return sum + item.gearItem.weight * item.quantity;
         }
         return sum;
@@ -308,7 +288,6 @@ export default function PackListDetailPage() {
       'Weight (g)',
       'Unit Weight (g)',
       'Type',
-      'Included',
     ];
     const rows = packList.items.map(item => [
       item.gearItem.name,
@@ -319,7 +298,6 @@ export default function PackListDetailPage() {
       item.gearItem.weight,
       `${item.gearItem.isWorn ? 'Worn' : ''}${item.gearItem.isConsumable ? ' Consumable' : ''}`.trim() ||
         'Base',
-      item.isIncluded ? 'Yes' : 'No',
     ]);
 
     const csvContent = [headers, ...rows]

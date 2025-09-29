@@ -73,13 +73,34 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           gearItemId: validatedData.gearItemId,
         },
       },
+      include: {
+        gearItem: {
+          include: {
+            category: true,
+          },
+        },
+      },
     });
 
     if (existingItem) {
-      return NextResponse.json(
-        { error: 'Item already exists in pack list' },
-        { status: 409 }
-      );
+      // If item already exists, increase the quantity instead of throwing an error
+      const updatedItem = await prisma.packListItem.update({
+        where: {
+          id: existingItem.id,
+        },
+        data: {
+          quantity: existingItem.quantity + validatedData.quantity,
+        },
+        include: {
+          gearItem: {
+            include: {
+              category: true,
+            },
+          },
+        },
+      });
+
+      return NextResponse.json(updatedItem, { status: 200 });
     }
 
     const packListItem = await prisma.packListItem.create({
@@ -87,7 +108,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         packListId: id,
         gearItemId: validatedData.gearItemId,
         quantity: validatedData.quantity,
-        isIncluded: validatedData.isIncluded,
+        isIncluded: true, // Always include items by default (no checkbox concept)
       },
       include: {
         gearItem: {

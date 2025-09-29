@@ -2,17 +2,10 @@
 
 import { useState } from 'react';
 
-import { Eye, EyeOff, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -67,36 +60,6 @@ export function PackListItemsTable({
 }: PackListItemsTableProps) {
   const [editingItem, setEditingItem] = useState<string | null>(null);
   const [editQuantity, setEditQuantity] = useState<number>(1);
-
-  const handleIncludedChange = async (
-    item: PackListItem,
-    included: boolean
-  ) => {
-    try {
-      const response = await fetch(
-        `/api/pack-lists/${packListId}/items/${item.id}`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            isIncluded: included,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to update item');
-      }
-
-      const updatedItem = await response.json();
-      onItemUpdated(updatedItem);
-    } catch (error) {
-      console.error('Error updating item:', error);
-      alert('Failed to update item. Please try again.');
-    }
-  };
 
   const handleQuantityEdit = (item: PackListItem) => {
     setEditingItem(item.id);
@@ -169,7 +132,8 @@ export function PackListItemsTable({
           No items in this pack list yet
         </p>
         <p className="text-sm text-muted-foreground">
-          Use the "Add Gear" button to add items from your gear library
+          Use the &quot;Add Gear&quot; button to add items from your gear
+          library
         </p>
       </div>
     );
@@ -179,7 +143,6 @@ export function PackListItemsTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[50px]">Inc.</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Category</TableHead>
           <TableHead>Unit Weight</TableHead>
@@ -195,18 +158,7 @@ export function PackListItemsTable({
           const isEditing = editingItem === item.id;
 
           return (
-            <TableRow
-              key={item.id}
-              className={!item.isIncluded ? 'opacity-50' : ''}
-            >
-              <TableCell>
-                <Checkbox
-                  checked={item.isIncluded}
-                  onCheckedChange={checked =>
-                    handleIncludedChange(item, checked as boolean)
-                  }
-                />
-              </TableCell>
+            <TableRow key={item.id}>
               <TableCell>
                 <div className="space-y-1">
                   <div className="font-medium">{item.gearItem.name}</div>
@@ -299,43 +251,24 @@ export function PackListItemsTable({
                 </div>
               </TableCell>
               <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        handleIncludedChange(item, !item.isIncluded)
-                      }
-                    >
-                      {item.isIncluded ? (
-                        <>
-                          <EyeOff className="mr-2 h-4 w-4" />
-                          Exclude
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Include
-                        </>
-                      )}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleQuantityEdit(item)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Edit Quantity
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleDelete(item)}
-                      className="text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Remove
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleQuantityEdit(item)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleDelete(item)}
+                    className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           );
